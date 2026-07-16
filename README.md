@@ -1,2 +1,2 @@
-# Ambition-
+# Ambition
 superpowers lite
