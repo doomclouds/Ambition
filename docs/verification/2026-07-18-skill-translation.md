@@ -210,3 +210,143 @@ git diff --check
 ## 提交
 
 提交主题：`feat(skills): translate design and quality workflows`。提交哈希在交接时以当前 Git 历史查询为准，避免在提交内容中写入不可自洽的自引用哈希。
+
+---
+
+# 计划、委派、评审与技能创作迁移记录
+
+## 批次契约 RED
+
+在 9 个目标技能目录尚不存在时，一次性把 Tasks 3～5 的全部必需短语写入
+`tests/contracts/skill-contracts.json`，并把精确 14 技能清单写入
+`tests/contracts/skill-contracts.test.mjs`。随后执行：
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTHONUTF8='1'
+node --test .\tests\contracts\skill-contracts.test.mjs
+```
+
+结果：15 个测试中 5 个通过、10 个失败。9 个失败分别准确指出目标
+`skills/<name>/SKILL.md must exist`，另 1 个失败显示实际目录只有既有 5 项、缺少批准清单中的
+9 项。失败来自待迁移技能缺失，不是语法、编码或测试基础设施错误。
+
+## 批量迁移边界
+
+迁移并中文化这些技能：
+
+1. `writing-plans`
+2. `executing-plans`
+3. `using-git-worktrees`
+4. `finishing-a-development-branch`
+5. `dispatching-parallel-agents`
+6. `subagent-driven-development`
+7. `requesting-code-review`
+8. `receiving-code-review`
+9. `writing-skills`
+
+保留 `writing-plans/plan-document-reviewer-prompt.md`，`subagent-driven-development` 的两个提示词和
+三个脚本，`requesting-code-review/code-reviewer.md`，以及 `writing-skills` 的三个辅助 Markdown、
+`graphviz-conventions.dot` 和 `render-graphs.js`。未迁入上游未被运行面引用的
+`writing-skills/examples/`。
+
+所有技能描述均以 `Use when` 开头并含中文触发条件。代理称谓、调度方式和权限改为 Codex
+语境；Git 示例使用独立跨平台 Git 命令，未加入 PowerShell `&&`；分支收尾没有自动 push。
+
+## 精确 14 技能清单
+
+- `brainstorming`
+- `dispatching-parallel-agents`
+- `executing-plans`
+- `finishing-a-development-branch`
+- `receiving-code-review`
+- `requesting-code-review`
+- `subagent-driven-development`
+- `systematic-debugging`
+- `test-driven-development`
+- `using-git-worktrees`
+- `using-superpowers`
+- `verification-before-completion`
+- `writing-plans`
+- `writing-skills`
+
+测试对实际技能目录排序后与该清单做深度相等比较；缺失或多余目录都会失败。
+
+## 统一 GREEN
+
+执行技能契约：
+
+```powershell
+node --test .\tests\contracts\skill-contracts.test.mjs
+```
+
+结果为 15/15 通过、0 失败：精确目录清单 1 项，14 个技能契约 14 项。
+
+对全部 14 个技能使用显式目录数组执行 `quick_validate.py`，没有依赖
+`Get-ChildItem` 多路径 `-Directory` 的枚举语义：
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTHONUTF8='1'
+$skillDirs = @(
+  '.\skills\brainstorming',
+  '.\skills\dispatching-parallel-agents',
+  '.\skills\executing-plans',
+  '.\skills\finishing-a-development-branch',
+  '.\skills\receiving-code-review',
+  '.\skills\requesting-code-review',
+  '.\skills\subagent-driven-development',
+  '.\skills\systematic-debugging',
+  '.\skills\test-driven-development',
+  '.\skills\using-git-worktrees',
+  '.\skills\using-superpowers',
+  '.\skills\verification-before-completion',
+  '.\skills\writing-plans',
+  '.\skills\writing-skills'
+)
+foreach ($skillDir in $skillDirs) {
+  python 'C:\Users\10062\.codex\skills\.system\skill-creator\scripts\quick_validate.py' $skillDir
+  if ($LASTEXITCODE -ne 0) { throw "skill validation failed: $skillDir" }
+}
+```
+
+结果：14 次均输出 `Skill is valid!`，循环退出码 0。
+
+脚本验证：
+
+- `render-graphs.js` 的 `node --check` 通过；仓库声明 `type: module`，因此脚本已从上游
+  CommonJS 调整为原生 ESM。实跑进入依赖检测并用中文报告缺少 Graphviz `dot`；当前环境无法生成 SVG。
+- 三份 SDD Bash 脚本经 Git Bash `bash -n` 全部通过。
+- `sdd-workspace` 实跑正确解析当前 worktree 的 `.superpowers/sdd`。
+- `task-brief` 从 Task 3 简报抽取 51 行，并验证标题匹配。
+- `review-package HEAD HEAD` 生成 7 行只读评审包，并验证中文标题；临时工件随后删除。
+
+## 人工语义筛选
+
+按简报 9 个场景逐项检查正文和模板：
+
+| 技能 | 观察结论 |
+|---|---|
+| `writing-plans` | 计划模板包含精确路径、接口、命令/实现要点、语义验收、恢复状态和开放决策；上下文压缩后可交接。 |
+| `executing-plans` | 先核对现状并调整陈旧步骤；高影响阻塞或权限歧义才暂停，不擅自扩权。 |
+| `using-git-worktrees` | 先用 Git 命令检测现有隔离，再优先 Codex 原生 worktree 能力；隔离无净收益时不强制创建。 |
+| `finishing-a-development-branch` | 先确认真实分支、仓库策略和权限；合并、PR、保留、丢弃及 push 均不自动执行。 |
+| `dispatching-parallel-agents` | 共享同一文件时先评估独立性、协调成本和净收益；无安全所有权切分则不并行写入。 |
+| `subagent-driven-development` | 委派契约显式传递工作区、简报、验收、报告和 `commit_authority`；没有权限时只报告工作区差异。 |
+| `requesting-code-review` | 低风险机械工作不机械升级为独立评审；安全、数据完整性、跨模块和实质整体修改按风险评审。 |
+| `receiving-code-review` | 评审意见先与代码、意图、耦合、安全和证据核对；独立明确事项可单独推进。 |
+| `writing-skills` | 单仓库机械路径规则优先进入仓库指令或自动化；指导形式匹配失败类型，并要求比例适配的反事实证据。 |
+
+全文筛查未发现其他平台专属代理工具、固定评审扇出、自动 push 或未授权发布语义。
+
+## 自审与关注点
+
+- 只修改 Tasks 3～5 指定的 9 个技能、契约、精确清单和统一验证记录；未进入 Tasks 6～7。
+- 上游 `superpowers-lite` 只读使用，没有写入、删除或生成文件。
+- Markdown 保留文件均含中文正文且相对链接由契约测试验证；代码和代码注释保持英文，脚本用户输出中文。
+- `writing-skills/examples/` 未进入交付面；其余简报指定辅助文件全部保留。
+- 唯一环境限制是本机缺少 Graphviz `dot`，因此 `render-graphs.js` 只能验证 ESM 运行入口、依赖检测和中文错误输出，不能生成 SVG。
+
+## 提交
+
+提交主题：`feat(skills): translate remaining Codex workflows`。提交哈希在交接时从 Git 历史读取，避免验证记录写入会因 amend 失效的自引用哈希。

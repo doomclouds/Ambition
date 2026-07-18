@@ -10,6 +10,30 @@ const contracts = JSON.parse(
 );
 const normalize = (value) => value.replace(/\s+/gu, ' ').trim();
 const withoutCodeFences = (value) => value.replace(/```[\s\S]*?```/gu, '');
+const expectedSkills = [
+  'brainstorming',
+  'dispatching-parallel-agents',
+  'executing-plans',
+  'finishing-a-development-branch',
+  'receiving-code-review',
+  'requesting-code-review',
+  'subagent-driven-development',
+  'systematic-debugging',
+  'test-driven-development',
+  'using-git-worktrees',
+  'using-superpowers',
+  'verification-before-completion',
+  'writing-plans',
+  'writing-skills'
+];
+
+test('publishes exactly the approved skill set', () => {
+  const actualSkills = fs.readdirSync(skillsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  assert.deepEqual(actualSkills, [...expectedSkills].sort());
+});
 
 for (const [skillId, requiredPhrases] of Object.entries(contracts)) {
   test(`${skillId} has valid Chinese skill contracts`, () => {
