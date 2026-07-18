@@ -24,9 +24,9 @@ codex plugin add superpowers-lite@superpowers-lite
 名称。插件安装后可直接描述任务；`using-superpowers` 会先判断风险与规模，再选择真正
 匹配的技能。
 
-rootless 发布归档不包含 `.agents/plugins/marketplace.json`，因此不能直接作为 marketplace 根目录。
-请把归档解压到已配置 marketplace 的 `plugins/superpowers-lite` 目录，或直接使用
-包含 marketplace 清单的仓库源码按上述两步安装。
+rootless 发布归档不包含 `.agents/plugins/marketplace.json`，因此不能直接作为 marketplace 根目录，
+也不会因为复制到某个 `plugins/` 目录就被 Codex 自动发现。该归档用于发布、审计和下游
+marketplace 组装；直接安装请使用包含 marketplace 清单的仓库源码并执行上述两条命令。
 
 ## 本地验证
 
