@@ -692,3 +692,43 @@ foreach ($skillDir in $skillDirs) {
 - 归档包含 54 个条目、13 个技能，SHA-256
   `eb0637e200e4a30026f61d832f3118d78eb823b074b7883711200afb2fc322d8`。
 - 未运行真实 GPT-5.6 模型质量基准；压力场景是可审计行为契约，不冒充模型评测分数。
+
+---
+
+# 计划执行交接与 `0.1.6` 发布验证
+
+## 设计与边界
+
+- 书面计划一旦生成，后续实现必须先进入 `executing-plans` 或
+  `subagent-driven-development`，不再允许从计划正文直接滑入编码。
+- 当前会话已获“继续做”“后面不用管”等预授权时不重复询问；用户把执行方式交给模型时，
+  由模型按任务复杂度、代理净收益和上下文连续性选择执行工作流。
+- 两个以上语义交付、跨多次工具调用或需要压缩后恢复时，执行前创建 `update_plan`；任务保持
+  恰好一个 `in_progress`，只有验证和对应提交完成后才能标记完成。
+- `update_plan` 只承担会话进度，不替代持久计划、Git 提交或完成验证；单个短交付可以按比例跳过。
+
+## RED / GREEN
+
+- 先增加阶段交接、预授权、任务状态和 `0.1.6` 版本契约。旧正文运行 33 项测试得到 25 项
+  通过、8 项按预期失败，覆盖三处旧版本和四个技能/参考缺失的新语义。
+- 实现四个技能和 Codex 工具映射并统一升级版本后，`npm test` 恢复 33/33 GREEN。
+- 本轮真实执行按设计完成 `writing-plans -> executing-plans -> update_plan` 交接，四个任务均按
+  语义交付拆分，并在验证和提交后同步状态。
+
+## 完整验证
+
+- `npm --prefix .\plugins\superpowers-lite test`：33/33 通过，0 失败、0 跳过。
+- 显式枚举全部技能运行 `quick_validate.py`：13/13 输出 `Skill is valid!`。
+- `validate_plugin.py .\plugins\superpowers-lite`：输出 `Plugin validation passed`。
+- `test-runtime-scripts.sh`：12 项污染定位和临时路径安全的真实 Bash 行为检查全部通过。
+- `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、身份、元数据、可执行位、哈希和确定性重建通过。
+- Codex-only 禁止路径扫描、三处版本一致性、组合差异审查和 `git diff --check` 通过。
+
+## 正式归档
+
+- 从干净实现提交 `e5b776419658ec157bf16c4adf3c29b5153fcfc3` 生成
+  `superpowers-lite-0.1.6.zip`。
+- 根层只包含 `.codex-plugin/`、`assets/`、`skills/`、`README.md` 和 `LICENSE`。
+- 归档包含 54 个条目、13 个技能，SHA-256
+  `c3ed6d22d6fc9fbee5aced29be55cbb9771298dd726a7e980d44ca4c7e1e2718`。
+- 未运行真实 GPT-5.6 模型前向质量基准；压力场景验证的是可审计工作流契约，不冒充模型评分。
