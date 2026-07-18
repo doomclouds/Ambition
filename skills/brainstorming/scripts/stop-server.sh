@@ -13,6 +13,42 @@ if [[ -z "$SESSION_DIR" ]]; then
   exit 1
 fi
 
+canonical_tmp="$(cd -P /tmp 2>/dev/null && pwd -P)"
+DELETE_SESSION_DIR=""
+
+resolve_safe_ephemeral_session() {
+  local candidate="$1"
+  local normalized_input="/${candidate//\\//}/"
+  local canonical_candidate
+  local candidate_parent
+  local candidate_name
+
+  [[ "$normalized_input" != *'/../'* ]] || return 1
+  if [[ -L "$candidate" ]]; then
+    return 1
+  fi
+  if command -v node >/dev/null 2>&1 &&
+    node -e "const fs=require('fs'); process.exit(fs.lstatSync(process.argv[1]).isSymbolicLink() ? 0 : 1)" "$candidate" 2>/dev/null; then
+    return 1
+  fi
+  [[ -d "$candidate" ]] || return 1
+
+  canonical_candidate="$(cd -P -- "$candidate" 2>/dev/null && pwd -P)" || return 1
+  candidate_parent="$(dirname -- "$canonical_candidate")"
+  candidate_name="$(basename -- "$canonical_candidate")"
+
+  [[ "$candidate_parent" == "$canonical_tmp" ]] || return 1
+  [[ "$candidate_name" == brainstorm-* ]] || return 1
+  printf '%s\n' "$canonical_candidate"
+}
+
+if [[ "$SESSION_DIR" == /tmp || "$SESSION_DIR" == /tmp/* ]]; then
+  if ! DELETE_SESSION_DIR="$(resolve_safe_ephemeral_session "$SESSION_DIR")"; then
+    echo '{"status": "refused", "error": "不安全的临时会话目录"}' >&2
+    exit 1
+  fi
+fi
+
 STATE_DIR="${SESSION_DIR}/state"
 PID_FILE="${STATE_DIR}/server.pid"
 SERVER_ID_FILE="${STATE_DIR}/server-instance-id"
@@ -109,9 +145,17 @@ if [[ -f "$PID_FILE" ]]; then
   rm -f "$PID_FILE" "$SERVER_ID_FILE" "${STATE_DIR}/server.log"
   mark_stopped "stop-server.sh"
 
-  # Only delete ephemeral /tmp directories
-  if [[ "$SESSION_DIR" == /tmp/* ]]; then
-    rm -rf "$SESSION_DIR"
+  # Delete only a canonical, direct /tmp/brainstorm-* child validated above.
+  if [[ -n "$DELETE_SESSION_DIR" ]]; then
+    revalidated_session_dir="$(resolve_safe_ephemeral_session "$DELETE_SESSION_DIR")" || {
+      echo '{"status": "refused", "error": "删除前临时会话目录校验失败"}' >&2
+      exit 1
+    }
+    if [[ "$revalidated_session_dir" != "$DELETE_SESSION_DIR" ]]; then
+      echo '{"status": "refused", "error": "删除前临时会话目录已变化"}' >&2
+      exit 1
+    fi
+    rm -rf -- "$revalidated_session_dir"
   fi
 
   echo '{"status": "stopped"}'

@@ -62,6 +62,10 @@ test('中文公开文档保留安装边界和上游归属', () => {
     assert.match(readme, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
   assert.equal(hasChinese(readme), true);
+  assert.match(readme, /codex plugin marketplace add <仓库根目录>/);
+  assert.match(readme, /codex plugin add superpowers-lite@superpowers-lite/);
+  assert.match(readme, /不包含 `\.agents\/plugins\/marketplace\.json`/);
+  assert.match(readme, /不能直接作为 marketplace 根目录/);
 
   const security = readText('SECURITY.md');
   assert.equal(hasChinese(security), true);
@@ -93,9 +97,12 @@ test('发布白名单和 CI 保持 Codex-only', () => {
   assert.match(workflow, /node-version:\s*24/);
   const npmTestIndex = workflow.indexOf('run: npm test');
   const packageTestIndex = workflow.indexOf('run: bash tests/codex/test-package-codex-plugin.sh');
+  const runtimeTestIndex = workflow.indexOf('run: bash tests/codex/test-runtime-scripts.sh');
   assert.notEqual(npmTestIndex, -1);
+  assert.notEqual(runtimeTestIndex, -1);
   assert.notEqual(packageTestIndex, -1);
-  assert.ok(npmTestIndex < packageTestIndex, 'CI 必须先运行契约再验证打包');
+  assert.ok(npmTestIndex < runtimeTestIndex, 'CI 必须先运行契约再验证运行脚本');
+  assert.ok(runtimeTestIndex < packageTestIndex, 'CI 必须先验证运行脚本再验证打包');
   assert.doesNotMatch(workflow, /hooks|claude|cursor|kimi|opencode|\.pi|antigravity/i);
 
   const attributes = readText('.gitattributes');

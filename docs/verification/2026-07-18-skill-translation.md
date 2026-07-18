@@ -379,7 +379,8 @@ foreach ($skillDir in $skillDirs) {
 
 在 UTF-8 Python 模式下执行最终批次验证：
 
-- `npm test`：20/20 通过，覆盖 5 项插件/发布契约、精确 14 技能清单和 14 项中文语义契约。
+- `npm test`：23/23 通过，覆盖 5 项插件/发布契约、精确 14 技能清单、契约键集合、Codex-only 文案边界、发布脚本文案和 14 项中文语义契约。
+- `tests/codex/test-runtime-scripts.sh`：真实 Bash 行为测试全部通过，覆盖污染测试零匹配、启动前已污染、定位污染者、全清洁、NUL 安全文件名，以及临时会话符号链接和 `..` 路径拒绝。
 - `validate_plugin.py .`：输出 `Plugin validation passed`。
 - 对显式列出的 14 个技能逐一运行 `quick_validate.py`：14/14 输出 `Skill is valid!`。
 - `tests/codex/test-package-codex-plugin.sh`：ZIP 与 tar.gz 的根层白名单、身份、固定元数据、可执行位、校验和输出和重复构建一致性全部通过。
@@ -398,7 +399,44 @@ foreach ($skillDir in $skillDirs) {
 - 根层：仅 `.codex-plugin/`、`assets/`、`skills/`、`README.md` 和 `LICENSE`
 - 条目：65
 - 技能：14
-- SHA-256：`9472e8b1df35d6a3f542277eec6a0040cb699ec63ce0f521980b22d54e41591a`
+- SHA-256：该值在最终总审查修复改变发布面后重新生成，见下节最终提交验证。
 
 归档不包含验证文档。提交本节后从新 `HEAD` 复跑打包，实际校验和保持不变，证明产物只读取
 提交中的发布白名单内容，而不受验证记录提交影响。
+
+---
+
+# 最终总审查集中修复
+
+## 审查核对与根因
+
+最终总审查指出的四项 Important 均通过源码和真实执行确认：
+
+1. `visual-companion.md` 仍保留其他平台名称和专属后台工具语义，根因是翻译时保留了上游适配器示例；现只保留 Codex 启动方式和平台无关降级。
+2. `find-polluter.sh` 使用换行文本加未引用 `for` 循环收集文件，既没有补齐 `find .` 所需的 `./`，也会拆坏空格或换行文件名；零匹配被计为 1，启动前污染只跳过，最终还会错误报告全清洁。
+3. 初次迁移主要中文化 Markdown，遗漏了 Shell/JavaScript 的用户可见错误和测试断言输出。
+4. `stop-server.sh` 只用 `/tmp/*` 字符串前缀决定 `rm -rf`，没有拒绝符号链接、`..` 或确认规范路径的父目录和 basename。
+
+## 聚合 RED
+
+先一次性增加契约和真实 Bash 行为测试，再修改实现：
+
+- `npm test`：23 项中 19 项通过、4 项按预期失败，分别锁定 README 安装流程、CI 行为测试、非 Codex 平台术语和英文脚本输出。
+- `tests/codex/test-runtime-scripts.sh`：13 项按预期失败，准确复现零匹配成功退出、启动前污染继续执行、找不到带空格的污染者、错误全清洁结论、非 NUL 安全收集，以及符号链接和 `..` 路径未被拒绝。
+
+## 修复边界
+
+- `find-polluter.sh` 规范化相对模式，使用 `find -print0`、`sort -z` 和引用数组收集文件；零匹配与启动前污染明确失败，找到污染者以非零退出，全 CLI 输出中文。
+- `stop-server.sh` 在任何进程操作前拒绝不安全临时路径，并在删除前再次校验；只有规范 `/tmp` 的直接子目录、basename 以 `brainstorm-` 开头且不是符号链接时才允许删除。
+- `server.cjs` 的帧校验、WebSocket 解析、文件监视、生命周期与端口绑定错误已中文化；协议键、命令和代码标识保持兼容。
+- 技能与 README 的正式发布树增加 Codex-only 术语契约；契约 JSON 键集合必须与精确 14 技能集合一致。README 改为仓库 marketplace 两步安装，并明确 rootless 归档不含 marketplace 清单。
+- CI 在契约与打包测试之间运行真实 Bash 行为测试；Shell 测试断言输出全部使用中文。
+
+## 最终提交验证
+
+- `npm test`：23/23 通过。
+- `tests/codex/test-runtime-scripts.sh`：全部通过。
+- `validate_plugin.py .`：`Plugin validation passed`。
+- 显式 14 技能 `quick_validate.py`：14/14 输出 `Skill is valid!`。
+- Node/Shell 语法检查与 `git diff --check`：通过。
+- `tests/codex/test-package-codex-plugin.sh`：提交后验证结果与最终 SHA-256 记录在 `.superpowers/sdd/final-review-fixes-report.md`，归档仍只读取发布白名单。

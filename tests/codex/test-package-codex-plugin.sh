@@ -36,8 +36,8 @@ assert_equals() {
     pass "$description"
   else
     fail "$description"
-    echo "    expected: $expected"
-    echo "    actual:   $actual"
+    echo "    期望值：$expected"
+    echo "    实际值：$actual"
   fi
 }
 
@@ -50,7 +50,7 @@ assert_contains() {
     pass "$description"
   else
     fail "$description"
-    echo "    expected to find: $needle"
+    echo "    期望包含：$needle"
   fi
 }
 

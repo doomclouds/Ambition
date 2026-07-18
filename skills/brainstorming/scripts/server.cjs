@@ -46,7 +46,7 @@ function decodeFrame(buffer) {
   let payloadLen = secondByte & 0x7F;
   let offset = 2;
 
-  if (!masked) throw new Error('Client frames must be masked');
+  if (!masked) throw new Error('客户端 WebSocket 帧必须设置掩码');
 
   if (payloadLen === 126) {
     if (buffer.length < 4) return null;
@@ -56,14 +56,14 @@ function decodeFrame(buffer) {
     if (buffer.length < 10) return null;
     const extendedLen = buffer.readBigUInt64BE(2);
     if (extendedLen > BigInt(MAX_FRAME_PAYLOAD_BYTES)) {
-      throw new Error('WebSocket frame payload exceeds maximum allowed size');
+      throw new Error('WebSocket 帧载荷超过允许的最大大小');
     }
     payloadLen = Number(extendedLen);
     offset = 10;
   }
 
   if (payloadLen > MAX_FRAME_PAYLOAD_BYTES) {
-    throw new Error('WebSocket frame payload exceeds maximum allowed size');
+    throw new Error('WebSocket 帧载荷超过允许的最大大小');
   }
 
   const maskOffset = offset;
@@ -482,7 +482,7 @@ function handleMessage(text) {
   try {
     event = JSON.parse(text);
   } catch (e) {
-    console.error('Failed to parse WebSocket message:', e.message);
+    console.error('解析 WebSocket 消息失败：', e.message);
     return;
   }
   touchActivity();
@@ -526,7 +526,7 @@ function maybeOpenBrowser() {
 
 // ========== Activity Tracking ==========
 
-// Idle timeout: shut down after this long with no activity. Default 4 hours;
+// Inactivity timeout: shut down after this long with no activity. Default 4 hours;
 // override with BRAINSTORM_IDLE_TIMEOUT_MS (start-server.sh: --idle-timeout-minutes).
 const IDLE_TIMEOUT_MS = (() => {
   const ms = Number(process.env.BRAINSTORM_IDLE_TIMEOUT_MS);
@@ -588,7 +588,7 @@ function startServer() {
       broadcast({ type: 'reload' });
     }, 100));
   });
-  watcher.on('error', (err) => console.error('fs.watch error:', err.message));
+  watcher.on('error', (err) => console.error('文件监视失败：', err.message));
 
   function shutdown(reason) {
     console.log(JSON.stringify({ type: 'server-stopped', reason }));
@@ -615,19 +615,19 @@ function startServer() {
 
   // Periodically exit if the owner process died or we've been idle too long.
   const lifecycleCheck = setInterval(() => {
-    if (!ownerAlive()) shutdown('owner process exited');
-    else if (Date.now() - lastActivity > IDLE_TIMEOUT_MS) shutdown('idle timeout');
+    if (!ownerAlive()) shutdown('所属进程已退出');
+    else if (Date.now() - lastActivity > IDLE_TIMEOUT_MS) shutdown('空闲超时');
   }, LIFECYCLE_CHECK_MS);
   lifecycleCheck.unref();
 
   // Validate owner PID at startup. If it's already dead, the PID resolution
   // was wrong (common on WSL, Tailscale SSH, and cross-user scenarios).
-  // Disable monitoring and rely on the idle timeout instead.
+  // Disable monitoring and rely on the inactivity timeout instead.
   if (ownerPid) {
     try { process.kill(ownerPid, 0); }
     catch (e) {
       if (e.code !== 'EPERM') {
-        console.log(JSON.stringify({ type: 'owner-pid-invalid', pid: ownerPid, reason: 'dead at startup' }));
+        console.log(JSON.stringify({ type: 'owner-pid-invalid', pid: ownerPid, reason: '启动时进程已不存在' }));
         ownerPid = null;
       }
     }
@@ -668,7 +668,7 @@ function startServer() {
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE' && !triedFallback) {
       if (tokenSource === 'env') {
-        console.error('Server failed to bind: preferred port is in use and BRAINSTORM_TOKEN is set; refusing fallback with explicit token');
+        console.error('服务器绑定失败：首选端口已被占用，且已设置 BRAINSTORM_TOKEN；显式令牌模式下拒绝回退');
         process.exit(1);
       }
       triedFallback = true;
@@ -679,7 +679,7 @@ function startServer() {
       }
       server.listen(PORT, HOST, onListen);
     } else {
-      console.error('Server failed to bind:', err.message);
+      console.error('服务器绑定失败：', err.message);
       process.exit(1);
     }
   });

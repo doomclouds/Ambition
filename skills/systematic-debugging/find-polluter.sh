@@ -1,63 +1,65 @@
 #!/usr/bin/env bash
-# Bisection script to find which test creates unwanted files/state
-# Usage: ./find-polluter.sh <file_or_dir_to_check> <test_pattern>
-# Example: ./find-polluter.sh '.git' 'src/**/*.test.ts'
+# Find the first test that creates unwanted files or state.
 
-set -e
+set -euo pipefail
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <file_to_check> <test_pattern>"
-  echo "Example: $0 '.git' 'src/**/*.test.ts'"
+if [[ $# -ne 2 ]]; then
+  echo "用法：$0 <要检查的文件或目录> <测试文件模式>"
+  echo "示例：$0 '.git' 'src/**/*.test.ts'"
   exit 1
 fi
 
 POLLUTION_CHECK="$1"
 TEST_PATTERN="$2"
 
-echo "🔍 Searching for test that creates: $POLLUTION_CHECK"
-echo "Test pattern: $TEST_PATTERN"
-echo ""
+if [[ -e "$POLLUTION_CHECK" || -L "$POLLUTION_CHECK" ]]; then
+  echo "错误：检测目标在测试开始前已经存在：$POLLUTION_CHECK" >&2
+  exit 2
+fi
 
-# Get list of test files
-TEST_FILES=$(find . -path "$TEST_PATTERN" | sort)
-TOTAL=$(echo "$TEST_FILES" | wc -l | tr -d ' ')
+if [[ "$TEST_PATTERN" != ./* && "$TEST_PATTERN" != /* ]]; then
+  TEST_PATTERN="./$TEST_PATTERN"
+fi
 
-echo "Found $TOTAL test files"
-echo ""
+TEST_FILES=()
+while IFS= read -r -d '' test_file; do
+  TEST_FILES+=("$test_file")
+done < <(find . -path "$TEST_PATTERN" -print0 | LC_ALL=C sort -z)
+
+TOTAL=${#TEST_FILES[@]}
+if [[ "$TOTAL" -eq 0 ]]; then
+  echo "错误：未找到匹配的测试文件：$TEST_PATTERN" >&2
+  exit 2
+fi
+
+echo "🔍 正在查找创建检测目标的测试：$POLLUTION_CHECK"
+echo "测试文件模式：$TEST_PATTERN"
+echo "共找到 $TOTAL 个测试文件"
+echo
 
 COUNT=0
-for TEST_FILE in $TEST_FILES; do
+for TEST_FILE in "${TEST_FILES[@]}"; do
   COUNT=$((COUNT + 1))
 
-  # Skip if pollution already exists
-  if [ -e "$POLLUTION_CHECK" ]; then
-    echo "⚠️  Pollution already exists before test $COUNT/$TOTAL"
-    echo "   Skipping: $TEST_FILE"
-    continue
-  fi
+  printf '[%d/%d] 正在运行：%q\n' "$COUNT" "$TOTAL" "$TEST_FILE"
 
-  echo "[$COUNT/$TOTAL] Testing: $TEST_FILE"
+  npm test "$TEST_FILE" >/dev/null 2>&1 || true
 
-  # Run the test
-  npm test "$TEST_FILE" > /dev/null 2>&1 || true
-
-  # Check if pollution appeared
-  if [ -e "$POLLUTION_CHECK" ]; then
-    echo ""
-    echo "🎯 FOUND POLLUTER!"
-    echo "   Test: $TEST_FILE"
-    echo "   Created: $POLLUTION_CHECK"
-    echo ""
-    echo "Pollution details:"
-    ls -la "$POLLUTION_CHECK"
-    echo ""
-    echo "To investigate:"
-    echo "  npm test $TEST_FILE    # Run just this test"
-    echo "  cat $TEST_FILE         # Review test code"
+  if [[ -e "$POLLUTION_CHECK" || -L "$POLLUTION_CHECK" ]]; then
+    echo
+    echo "🎯 找到污染源"
+    printf '   测试文件：%s\n' "$TEST_FILE"
+    printf '   创建目标：%s\n' "$POLLUTION_CHECK"
+    echo
+    echo "污染目标详情："
+    ls -la -- "$POLLUTION_CHECK"
+    echo
+    echo "后续排查命令："
+    printf '  npm test %q\n' "$TEST_FILE"
     exit 1
   fi
 done
 
-echo ""
-echo "✅ No polluter found - all tests clean!"
+echo
+echo "✅ 未找到污染源，所有测试均保持清洁"
 exit 0

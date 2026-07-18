@@ -220,7 +220,7 @@ elif archive_format == "tar.gz":
                     else:
                         archive.addfile(info)
 else:
-    raise ValueError(f"unsupported archive format: {archive_format}")
+    raise ValueError(f"不支持的归档格式：{archive_format}")
 PY
 
 archive_paths="$(

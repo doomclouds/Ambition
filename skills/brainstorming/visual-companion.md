@@ -53,17 +53,6 @@ scripts/start-server.sh --project-dir /path/to/project --open
 
 **注意：** 把项目根目录传给 `--project-dir`，使原型保存在 `.superpowers/brainstorm/` 并跨重启留存。不传时，文件写入 `/tmp` 并在停止时清理。如果 `.superpowers/` 尚未忽略，提醒用户把它加入 `.gitignore`。
 
-**适配器示例：**
-
-**Claude Code：**
-
-```bash
-# 默认模式即可，脚本会自行把服务器置于后台。
-scripts/start-server.sh --project-dir /path/to/project --open
-```
-
-Windows 下脚本会自动切换到前台模式并阻塞工具调用。对 Bash 工具使用 `run_in_background: true`，让服务器跨轮次存活；下一轮读取 `$STATE_DIR/server-info` 获取 URL 与端口。
-
 **Codex：**
 
 ```bash
@@ -72,15 +61,7 @@ Windows 下脚本会自动切换到前台模式并阻塞工具调用。对 Bash 
 scripts/start-server.sh --project-dir /path/to/project --open
 ```
 
-**Copilot CLI：**
-
-```bash
-# 使用 --foreground，并以 mode: "async" 启动 Bash 工具，
-# 使进程跨轮次存活。保存 shellId，以便用 read_bash / stop_bash 交互。
-scripts/start-server.sh --project-dir /path/to/project --open --foreground
-```
-
-**其他环境：** 如果平台提供后台执行机制，在分离子进程会被回收时配合 `--foreground` 使用；否则跳过视觉伴侣，继续文字讨论。
+**平台无关降级：** 如果当前运行环境无法让本地服务器跨轮次存活，或无法把浏览器 URL 暴露给用户，就跳过视觉伴侣，继续使用文字讨论；不要让可视化能力阻塞头脑风暴。
 
 浏览器无法访问 URL 时（远程或容器环境很常见），绑定非回环地址：
 
