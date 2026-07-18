@@ -1,0 +1,23 @@
+name: Codex 插件验证
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: 运行 Codex 契约
+        run: npm test
+      - name: 验证运行脚本
+        run: bash tests/codex/test-runtime-scripts.sh
+      - name: 验证 Codex 打包
+        run: bash tests/codex/test-package-codex-plugin.sh

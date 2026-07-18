@@ -1,0 +1,12 @@
+# Keep text artifacts consistent across Windows and Unix checkouts.
+* text=auto
+*.md text eol=lf
+*.json text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.sh text eol=lf
+skills/**/scripts/* text eol=lf
+
+# Plugin artwork is binary.
+*.png binary
+*.svg text eol=lf
