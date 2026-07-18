@@ -60,7 +60,10 @@ python 'C:\Users\10062\.codex\skills\.system\skill-creator\scripts\quick_validat
 
 ## 提交
 
-初次提交哈希：`ccf6be4e3f65db0177dfb453b5c9390c542b7409`（提交信息：`feat(plugin): add Codex-only plugin scaffold`）。
+交付提交主题：`feat(plugin): add Codex-only plugin scaffold`。
+
+提交哈希属于 Git 历史元数据，交接时以 `git log --oneline` 或当前 `HEAD` 查询为准；验证
+记录不嵌入会因后续 amend 而失效的自引用哈希。
 
 ## 关注点
 
