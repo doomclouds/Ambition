@@ -350,3 +350,55 @@ foreach ($skillDir in $skillDirs) {
 ## 提交
 
 提交主题：`feat(skills): translate remaining Codex workflows`。提交哈希在交接时从 Git 历史读取，避免验证记录写入会因 amend 失效的自引用哈希。
+
+---
+
+# 最终清理与完整验收
+
+## 导入副本清理
+
+删除前使用 `Resolve-Path` 取得主检出导入副本的真实路径，并以
+`StringComparer.OrdinalIgnoreCase` 与批准路径
+`C:\WorkSpace\ResearchProjects\Ambition\superpowers-lite` 精确比较；同时确认其父目录就是
+主检出根目录。目标包含 202 个文件和 68 个子目录。删除后
+`Test-Path -LiteralPath 'C:\WorkSpace\ResearchProjects\Ambition\superpowers-lite'` 返回
+`False`。
+
+该目录是用户明确批准删除的未跟踪导入副本。Git 只能恢复已经迁入当前插件并提交的内容；
+未迁入的上游冗余文件无法从本仓库历史恢复。
+
+## 禁止表面扫描
+
+仓库根层不存在 `hooks`、`.claude-plugin`、`.cursor-plugin`、`.kimi-plugin`、`.opencode`、
+`.pi` 或嵌套 `superpowers-lite` 目录。对设计和计划历史说明以外的文件扫描
+`CLAUDE_PLUGIN_ROOT`、`CURSOR_PLUGIN_ROOT`、`KIMI`、`OPENCODE`、`session-start` 和
+`hooks/hooks` 时只有两类否定性命中：README 明确说明未包含其他平台适配层，契约测试列出
+禁止路径并断言 CI 不得引用这些平台；插件清单、技能、脚本和 CI 运行面没有残留引用。
+
+## 完整验证矩阵
+
+在 UTF-8 Python 模式下执行最终批次验证：
+
+- `npm test`：20/20 通过，覆盖 5 项插件/发布契约、精确 14 技能清单和 14 项中文语义契约。
+- `validate_plugin.py .`：输出 `Plugin validation passed`。
+- 对显式列出的 14 个技能逐一运行 `quick_validate.py`：14/14 输出 `Skill is valid!`。
+- `tests/codex/test-package-codex-plugin.sh`：ZIP 与 tar.gz 的根层白名单、身份、固定元数据、可执行位、校验和输出和重复构建一致性全部通过。
+- `git diff --check`：通过。
+
+## 人工回读与归档
+
+人工完整回读 `README.md`、两个清单、`package.json` 和 14 个 `SKILL.md`。公开说明与技能正文
+使用自然中文；技能描述均保留 `Use when` 发现契约；权限、验证、比例适配、Codex 工具语境和
+禁止自动 push 等关键约束完整。技能契约遍历每个技能目录下的 Markdown 文件并解析相对链接，
+当前全部链接目标存在。
+
+从已提交 `HEAD` 生成 rootless ZIP：
+
+- 路径：`../_tmp/superpowers-lite-packaging/superpowers-lite-0.1.0.zip`
+- 根层：仅 `.codex-plugin/`、`assets/`、`skills/`、`README.md` 和 `LICENSE`
+- 条目：65
+- 技能：14
+- SHA-256：`9472e8b1df35d6a3f542277eec6a0040cb699ec63ce0f521980b22d54e41591a`
+
+归档不包含验证文档。提交本节后从新 `HEAD` 复跑打包，实际校验和保持不变，证明产物只读取
+提交中的发布白名单内容，而不受验证记录提交影响。
