@@ -16,6 +16,14 @@
     "required_evidence": ["结构化生成规格、内联图片、可比性约束、对话中的精确文字和用户选择反馈。"]
   },
   {
+    "id": "brainstorming-premature-convergence-without-approval",
+    "skill": "brainstorming",
+    "pressure": "用户询问一个仍有多条可行路线的架构方向，模型倾向只给自己的首选方案并立即开始编码。",
+    "expected_decisions": ["主动扫描候选空间，展示实质不同的可行方案并推荐方向；把取舍和后果交给用户，等待清楚的选择或批准。"],
+    "forbidden_decisions": ["没有解释主要替代方向为何被排除就只给一个结论，或在方向确认前进入计划或实施。"],
+    "required_evidence": ["项目约束、候选方向、推荐理由、主要代价、可逆性和用户批准。"]
+  },
+  {
     "id": "parallel-shared-file-and-database",
     "skill": "dispatching-parallel-agents",
     "pressure": "两个候选任务都要改同一生成源并写同一测试数据库，但并行能节省一点时间。",
