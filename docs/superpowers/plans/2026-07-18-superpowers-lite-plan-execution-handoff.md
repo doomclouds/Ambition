@@ -57,7 +57,7 @@ Codex 工具参考、原版 Superpowers `d884ae04edebef577e82ff7c4e143debd0bbec9
 一致为 `0.1.6`。
 
 **候选路径：** 修改四个主技能和 Codex 工具参考，更新 manifest、package、marketplace。运行
-Node 契约、五个目标技能 `quick_validate.py` 和 `git diff --check`。
+Node 契约、四个目标技能 `quick_validate.py`、Codex 工具参考契约和 `git diff --check`。
 
 **连续性证据：** npm 契约全绿，目标技能校验通过，所有新增短语位于实际运行技能或一层参考。
 
