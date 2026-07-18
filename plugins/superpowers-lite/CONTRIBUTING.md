@@ -18,10 +18,13 @@
 
 ## 验证
 
+先切换到本文件所在的插件目录，再运行完整验证：
+
 ```powershell
 $env:PYTHONIOENCODING = 'utf-8'
 $env:PYTHONUTF8 = '1'
 npm test
+& 'C:\Program Files\Git\bin\bash.exe' .\tests\codex\test-runtime-scripts.sh
 & 'C:\Program Files\Git\bin\bash.exe' .\tests\codex\test-package-codex-plugin.sh
 ```
 

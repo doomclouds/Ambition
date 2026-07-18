@@ -111,7 +111,7 @@ if [[ "$ALLOW_DIRTY" -ne 1 ]]; then
   if [[ -n "$dirty_status" ]]; then
     echo "工作区存在未提交变更：" >&2
     printf '%s\n' "$dirty_status" | sed 's/^/  /' >&2
-    die "请先提交或暂存变更，或显式传入 --allow-dirty"
+    die "请先提交或清理变更，或显式传入 --allow-dirty"
   fi
 fi
 

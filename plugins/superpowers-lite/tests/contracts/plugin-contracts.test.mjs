@@ -59,10 +59,16 @@ test('市场清单只公开一个本地 superpowers-lite 条目', () => {
 test('许可证存在且仓库根层保持 Codex-only', () => {
   const license = readPluginText('LICENSE');
   assert.match(license, /MIT License/);
-  for (const relativePath of [
-    'hooks', '.claude-plugin', '.cursor-plugin', '.kimi-plugin', '.opencode', '.pi'
-  ]) {
-    assert.equal(fs.existsSync(path.join(pluginRoot, relativePath)), false, `${relativePath} 必须不存在`);
+  for (const [rootName, rootPath] of [['仓库根层', repoRoot], ['插件根层', pluginRoot]]) {
+    for (const relativePath of [
+      'hooks', '.claude-plugin', '.cursor-plugin', '.kimi-plugin', '.opencode', '.pi'
+    ]) {
+      assert.equal(
+        fs.existsSync(path.join(rootPath, relativePath)),
+        false,
+        `${rootName}/${relativePath} 必须不存在`
+      );
+    }
   }
 });
 
