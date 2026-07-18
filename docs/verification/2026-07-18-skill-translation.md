@@ -499,3 +499,39 @@ foreach ($skillDir in $skillDirs) {
   构建一致性全部通过。
 - 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
   `36078417298bccba1369045ecc9ab8b681841f2d5c0bcc82a3ef5f6ed3200a4f`。
+
+---
+
+# 自主子代理开发与统一审查验证
+
+## 组合 RED / GREEN
+
+- 先为 `writing-plans`、`executing-plans`、`subagent-driven-development` 和
+  `requesting-code-review` 增加自主执行语义契约，现有 24 项中 20 项通过、4 项按预期失败。
+- 技能正文和提示模板完成后恢复 24/24 GREEN；最终统一审查发现 3 个 Important：高风险门禁
+  发生过晚、风险对象触发范围过宽、三个提示模板未受文件级契约保护。
+- 审查修复先得到 27 项中 23 项通过、4 项按预期失败，再增加派发前风险分类、前置授权与
+  恢复门禁、边界变更或可信高影响限定，以及模板 required/forbidden 断言。
+- 最终契约 27/27 GREEN；同一审查者复核 3 个 Important 全部关闭，结论为
+  `Ready to merge: Yes`。
+
+## 交付行为
+
+- 计划成为目标、硬约束、真实依赖、最终验收和恢复状态的意图契约；实现步骤、实验和测试
+  顺序默认可调整。
+- 主模型可以根据代码和证据调整任务顺序、合并或拆分任务，并记录实质偏离，不逐项请示。
+- 普通子任务默认只做实现者自检、聚焦验证和主代理基本验收，不再执行完整规格与质量双审。
+- 不可逆、安全、权限和数据风险在派发前检查操作方案、授权及回滚或恢复路径；跨模块、兼容
+  和共享状态只在边界发生变更或存在可信高影响风险时触发中途聚焦审查。
+- 所有任务完成后对组合结果进行一次严格统一审查，Critical/Important 集中修复并组合复验。
+
+## 完整验证
+
+- `npm --prefix .\plugins\superpowers-lite test`：27/27 通过。
+- 显式完整 14 技能 `quick_validate.py`：14/14 通过。
+- Codex-only 禁止路径扫描、插件校验和 `git diff --check` 通过。
+- `test-runtime-scripts.sh`：全部真实 Bash 行为与路径安全测试通过。
+- `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、固定元数据、可执行位、SHA-256 和重复
+  构建一致性全部通过。
+- 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
+  `b6b2ca8006fb3d46eef4f92e67f42066bc94164909b520085d192a08b8408ef6`。
