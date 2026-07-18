@@ -107,6 +107,7 @@ test('中文公开文档保留安装边界和上游归属', () => {
 
 test('发布白名单和 CI 保持 Codex-only', () => {
   const packageJson = readPluginJson('package.json');
+  assert.equal(packageJson.version, '0.1.3');
   assert.deepEqual(packageJson.files, [
     '.codex-plugin',
     'assets',

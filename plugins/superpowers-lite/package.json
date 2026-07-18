@@ -1,11 +1,11 @@
 {
   "name": "superpowers-lite",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "面向 Codex 的风险适配型工程工作流技能集。",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "test": "node --test tests/contracts/plugin-contracts.test.mjs tests/contracts/skill-contracts.test.mjs"
+    "test": "node --test tests/contracts/plugin-contracts.test.mjs tests/contracts/skill-contracts.test.mjs tests/contracts/workflow-pressure-scenarios.test.mjs"
   },
   "files": [
     ".codex-plugin",

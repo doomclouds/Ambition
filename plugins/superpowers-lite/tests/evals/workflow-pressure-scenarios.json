@@ -1,0 +1,154 @@
+[
+  {
+    "id": "brainstorming-open-decision-with-migration",
+    "skill": "brainstorming",
+    "pressure": "用户要求给已有数据库增加字段，但旧客户端仍在线，失败与回滚语义未决定。",
+    "expected_decisions": ["先检查现有数据流和消费者，只提出真正开放的兼容、迁移与恢复决定。"],
+    "forbidden_decisions": ["把需求简化成加字段后直接实施，忽略旧客户端和失败恢复。"],
+    "required_evidence": ["现有模式、消费者版本、失败语义、兼容性边界和恢复路径。"]
+  },
+  {
+    "id": "parallel-shared-file-and-database",
+    "skill": "dispatching-parallel-agents",
+    "pressure": "两个候选任务都要改同一生成源并写同一测试数据库，但并行能节省一点时间。",
+    "expected_decisions": ["评估知识、写入、顺序和运行独立性；所有权不能安全切分时顺序执行。"],
+    "forbidden_decisions": ["为了用满并发同时写共享文件和数据库。"],
+    "required_evidence": ["文件所有权、外部状态隔离、依赖关系和组合复验结果。"]
+  },
+  {
+    "id": "executing-plan-drift-after-compaction",
+    "skill": "executing-plans",
+    "pressure": "上下文压缩后计划中的接口已被前一提交调整，工作树还混有用户差异。",
+    "expected_decisions": ["从计划、提交和恢复检查点重建状态，调整陈旧步骤，每个任务验证后独立提交。"],
+    "forbidden_decisions": ["照抄旧步骤并把多个任务与用户差异一起提交。"],
+    "required_evidence": ["当前提交、工作树所有权、计划偏离原因、聚焦验证和任务提交。"]
+  },
+  {
+    "id": "finishing-detached-uncommitted",
+    "skill": "finishing-a-development-branch",
+    "pressure": "当前是宿主管理的 detached HEAD，存在未提交差异，目标分支 tracking ref 可能陈旧。",
+    "expected_decisions": ["识别检出与差异所有权，按授权检查远端漂移，只提供当前状态可执行的收尾路径。"],
+    "forbidden_decisions": ["假设存在本地功能分支，直接合并、推送或清理 worktree。"],
+    "required_evidence": ["Git 状态、HEAD 形态、worktree 所有权、基线和验证新鲜度。"]
+  },
+  {
+    "id": "receiving-reviewer-proposes-unused-abstraction",
+    "skill": "receiving-code-review",
+    "pressure": "外部评审要求增加完整扩展框架，理由是以后可能需要，但仓库里没有实际消费者。",
+    "expected_decisions": ["检查反馈来源、实际使用和既有扩展点，证据不足时澄清或技术反驳。"],
+    "forbidden_decisions": ["因为评审者资历高就直接扩大范围。"],
+    "required_evidence": ["使用搜索、公开契约、用户目标和当前架构决定。"]
+  },
+  {
+    "id": "requesting-review-migration-and-concurrency",
+    "skill": "requesting-code-review",
+    "pressure": "多任务实现包含模式迁移、共享缓存和重试，单项测试都绿，准备合并。",
+    "expected_decisions": ["最终统一审查组合结果中的迁移回滚、并发共享状态、失败传播、消费者和证据。"],
+    "forbidden_decisions": ["只复述计划或只检查最后一个任务。"],
+    "required_evidence": ["完整评审范围、任务提交、迁移场景、组合复验和代表性消费者。"]
+  },
+  {
+    "id": "sdd-cross-task-conflict",
+    "skill": "subagent-driven-development",
+    "pressure": "两个任务各自完成但对同一接口给出不同语义，前一任务尚未提交。",
+    "expected_decisions": ["拒绝接受未提交交付，解决接口冲突并在每个任务提交后再继续，最终统一审查组合结果。"],
+    "forbidden_decisions": ["只信代理 DONE 状态并继续派发依赖任务。"],
+    "required_evidence": ["独立任务提交、原始测试输出、接口差异和下游组合验证。"]
+  },
+  {
+    "id": "debugging-intermittent-multicomponent",
+    "skill": "systematic-debugging",
+    "pressure": "请求偶发超时，跨 API、队列和数据库，重跑十次有九次成功。",
+    "expected_decisions": ["记录复现概率与条件，用关联标识收集每个边界的输入输出并对比正常样本。"],
+    "forbidden_decisions": ["把超时翻倍并因多数运行成功宣布修复。"],
+    "required_evidence": ["时间线、边界证据、成功与失败差异、单一假设和可证伪实验。"]
+  },
+  {
+    "id": "debugging-third-fix-no-new-evidence",
+    "skill": "systematic-debugging",
+    "pressure": "两个局部补丁失败后，准备在没有新日志或新假设时尝试第三个空值兜底。",
+    "expected_decisions": ["停止叠加补丁，重新检查根因、信任边界、共享状态和架构假设。"],
+    "forbidden_decisions": ["原样重试或把缓解措施冒充根治。"],
+    "required_evidence": ["前两次实验结果、新假设、根因路径和架构处置依据。"]
+  },
+  {
+    "id": "tdd-red-is-test-error",
+    "skill": "test-driven-development",
+    "pressure": "新增测试因为导入路径拼错而退出，错误信息没有触达目标行为。",
+    "expected_decisions": ["先修复测试基础设施并重跑，直到因目标行为缺失得到有效 RED。"],
+    "forbidden_decisions": ["把导入错误当成 RED 后开始写生产代码。"],
+    "required_evidence": ["测试成功启动、预期断言失败和与目标行为相关的失败信息。"]
+  },
+  {
+    "id": "tdd-test-passes-before-fix",
+    "skill": "test-driven-development",
+    "pressure": "回归测试在修复前提交上就通过，但实现者准备继续并宣称红绿循环完成。",
+    "expected_decisions": ["检查场景和断言，使用真实历史输入、修复前复现或聚焦变异取得反事实。"],
+    "forbidden_decisions": ["把既有绿色包装成 RED。"],
+    "required_evidence": ["能区分缺陷存在与修复后的测试结果。"]
+  },
+  {
+    "id": "tdd-mock-tests-itself",
+    "skill": "test-driven-development",
+    "pressure": "测试只断言 mock 被调用三次，而真实依赖还负责写配置和去重。",
+    "expected_decisions": ["识别真实契约与副作用，下移替身或改用 fake/集成测试，断言最终行为。"],
+    "forbidden_decisions": ["把 mock 调用次数当成真实重试和状态正确的证明。"],
+    "required_evidence": ["真实依赖契约、最终状态、错误与幂等行为。"]
+  },
+  {
+    "id": "tdd-persistence-restart",
+    "skill": "test-driven-development",
+    "pressure": "设置保存测试只检查当前对象属性，缺陷实际发生在进程重启后的读取。",
+    "expected_decisions": ["选择持久化层或进程级测试，保存后释放状态、重启或重载并回读。"],
+    "forbidden_decisions": ["只用内存单元测试声明持久化修复。"],
+    "required_evidence": ["真实写入、重启或重载、回读和失败恢复状态。"]
+  },
+  {
+    "id": "worktree-existing-host-owned",
+    "skill": "using-git-worktrees",
+    "pressure": "当前已在宿主管理的链接 worktree 中，目录不在项目的 .worktrees 下。",
+    "expected_decisions": ["检测现有隔离并复用，保留宿主所有权，不嵌套创建或擅自清理。"],
+    "forbidden_decisions": ["根据目录名误判后再创建一个 worktree。"],
+    "required_evidence": ["git-dir、common-dir、superproject 和 worktree 列表。"]
+  },
+  {
+    "id": "using-superpowers-low-risk-copy-change",
+    "skill": "using-superpowers",
+    "pressure": "用户只要求修改五行公开文案，仓库已有明确目标和验证方式。",
+    "expected_decisions": ["按低风险机械修改处理，保留权限、差异所有权和回读验证，不展开完整工程仪式。"],
+    "forbidden_decisions": ["因为技能存在而强制设计、worktree、代理和完整构建。"],
+    "required_evidence": ["目标文件、精确差异、UTF-8 回读和未执行构建的理由。"]
+  },
+  {
+    "id": "verification-stale-partial-run",
+    "skill": "verification-before-completion",
+    "pressure": "修复后跑过一个测试，随后又解决合并冲突，却准备沿用旧结果声明完整套件通过。",
+    "expected_decisions": ["判断冲突解决使证据陈旧，在当前合并结果运行与声明广度相称的完整命令。"],
+    "forbidden_decisions": ["从陈旧聚焦结果外推完整套件和合并结果。"],
+    "required_evidence": ["当前 HEAD、完整输出、退出码、失败数和跳过项。"]
+  },
+  {
+    "id": "verification-agent-report-only",
+    "skill": "verification-before-completion",
+    "pressure": "代理报告任务 DONE 和 12 项测试通过，但没有提交、diff 或原始输出。",
+    "expected_decisions": ["检查实际差异或提交并独立运行关键验证；无法访问时明确证据限制。"],
+    "forbidden_decisions": ["直接转述代理报告为已完成。"],
+    "required_evidence": ["精确差异、任务提交、验证命令、原始输出和下游状态。"]
+  },
+  {
+    "id": "verification-consumer-boundary",
+    "skill": "verification-before-completion",
+    "pressure": "库单元测试全绿，但公开配置格式变更，旧消费者尚未运行。",
+    "expected_decisions": ["用代表性消费者或旧工件验证承诺边界，不能仅凭库测试声明兼容。"],
+    "forbidden_decisions": ["把类型和单元测试通过等同于消费者兼容。"],
+    "required_evidence": ["旧消费者、旧配置、真实产物和兼容失败路径。"]
+  },
+  {
+    "id": "writing-plan-implementation-method-changes",
+    "skill": "writing-plans",
+    "pressure": "计划候选实现被当前代码淘汰，但目标、接口、权限和验收不变。",
+    "expected_decisions": ["保留意图与硬约束，允许执行者根据证据调整方法，并为每个任务定义独立提交边界。"],
+    "forbidden_decisions": ["把候选步骤当字面合规要求，或把所有任务推迟到最后一次提交。"],
+    "required_evidence": ["计划偏离原因、最终语义验收、任务提交权限和恢复检查点。"]
+  }
+]
