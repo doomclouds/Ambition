@@ -10,6 +10,7 @@ const contracts = JSON.parse(
 const scenarioFile = path.join(pluginRoot, 'tests', 'evals', 'workflow-pressure-scenarios.json');
 const requiredScenarioIds = [
   'brainstorming-open-decision-with-migration',
+  'brainstorming-imagegen-comparable-options',
   'parallel-shared-file-and-database',
   'executing-plan-drift-after-compaction',
   'finishing-detached-uncommitted',

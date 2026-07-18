@@ -4,23 +4,11 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 FIND_POLLUTER="$REPO_ROOT/skills/systematic-debugging/find-polluter.sh"
-STOP_SERVER="$REPO_ROOT/skills/brainstorming/scripts/stop-server.sh"
 
 FAILURES=0
 TEST_ROOT="$(mktemp -d)"
-TEMP_PATHS=()
 
 cleanup() {
-  local candidate
-  for candidate in "${TEMP_PATHS[@]}"; do
-    if [[ "$candidate" == /tmp/brainstorm-runtime-* || "$candidate" == /tmp/brainstorm-link-* ]]; then
-      if node -e "const fs=require('fs'); const p=process.argv[1]; process.exit(fs.existsSync(p) && fs.lstatSync(p).isSymbolicLink() ? 0 : 1)" "$candidate" 2>/dev/null; then
-        node -e "require('fs').unlinkSync(process.argv[1])" "$candidate"
-      else
-        rm -rf -- "$candidate"
-      fi
-    fi
-  done
   rm -rf -- "$TEST_ROOT"
 }
 trap cleanup EXIT
@@ -173,43 +161,6 @@ else
   fail "测试文件名按 NUL 安全边界逐个执行"
   echo "    期望调用数：2"
   echo "    实际调用数：$call_count"
-fi
-
-echo "stop-server.sh 路径安全测试"
-
-outside="$TEST_ROOT/outside"
-mkdir -p "$outside/state"
-: > "$outside/marker"
-symlink_path="/tmp/brainstorm-link-$$-$RANDOM"
-TEMP_PATHS+=("$symlink_path")
-if node -e "require('fs').symlinkSync(process.argv[1], process.argv[2], process.platform === 'win32' ? 'junction' : 'dir')" "$outside" "$symlink_path" 2>/dev/null; then
-  symlink_output="$($STOP_SERVER "$symlink_path" 2>&1)"
-  symlink_status=$?
-  assert_nonzero "$symlink_status" "拒绝 /tmp 下的会话符号链接"
-  assert_contains "$symlink_output" "不安全的临时会话目录" "符号链接拒绝原因使用中文"
-  if [[ -e "$outside/marker" ]]; then
-    pass "符号链接外部目标未被删除"
-  else
-    fail "符号链接外部目标未被删除"
-  fi
-else
-  fail "创建符号链接测试前置条件"
-fi
-
-traversal_parent="/tmp/brainstorm-runtime-parent-$$-$RANDOM"
-traversal_target="/tmp/brainstorm-runtime-target-$$-$RANDOM"
-TEMP_PATHS+=("$traversal_parent" "$traversal_target")
-mkdir -p "$traversal_parent" "$traversal_target/state"
-: > "$traversal_target/marker"
-traversal_path="$traversal_parent/../$(basename "$traversal_target")"
-traversal_output="$($STOP_SERVER "$traversal_path" 2>&1)"
-traversal_status=$?
-assert_nonzero "$traversal_status" "拒绝包含 .. 的临时会话路径"
-assert_contains "$traversal_output" "不安全的临时会话目录" "路径穿越拒绝原因使用中文"
-if [[ -e "$traversal_target/marker" ]]; then
-  pass "路径穿越目标未被删除"
-else
-  fail "路径穿越目标未被删除"
 fi
 
 if [[ "$FAILURES" -eq 0 ]]; then

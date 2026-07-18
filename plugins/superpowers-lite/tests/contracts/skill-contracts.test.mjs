@@ -100,6 +100,9 @@ const referenceContracts = [
   }
 ];
 
+const visualCompanionFile = path.join(skillsRoot, 'brainstorming', 'visual-companion.md');
+const visualCompanionScripts = path.join(skillsRoot, 'brainstorming', 'scripts');
+
 const skillForbiddenPhrases = {
   'subagent-driven-development': [
     '未获准时的工作区差异',
@@ -140,26 +143,34 @@ test('正式发布脚本的已知用户可见错误均已中文化', () => {
   assert.match(findPolluter, /用法/u);
   assert.match(findPolluter, /未找到匹配的测试文件/u);
 
-  const server = fs.readFileSync(path.join(skillsRoot, 'brainstorming', 'scripts', 'server.cjs'), 'utf8');
-  for (const englishOutput of [
-    'Client frames must be masked',
-    'WebSocket frame payload exceeds maximum allowed size',
-    'Failed to parse WebSocket message',
-    'fs.watch error',
-    'Server failed to bind',
-    'preferred port is in use',
-    'dead at startup',
-    'owner process exited',
-    'idle timeout'
-  ]) {
-    assert.equal(server.includes(englishOutput), false, `server.cjs 仍输出英文：${englishOutput}`);
-  }
-
   const packageScript = fs.readFileSync(path.join(root, 'scripts', 'package-codex-plugin.sh'), 'utf8');
   assert.doesNotMatch(packageScript, /unsupported archive format|Usage:|Error:|Archive:|Format:|Version:|Entries:|Skills:/u);
   for (const marker of ['用法：', '错误：', '归档：', '格式：', '版本：', '条目：', '技能：']) {
     assert.equal(packageScript.includes(marker), true, `打包脚本缺少中文用户文案：${marker}`);
   }
+});
+
+test('brainstorming 视觉伴侣只使用内置 ImageGen', () => {
+  assert.equal(fs.existsSync(visualCompanionFile), true, '视觉伴侣指南必须存在');
+  assert.equal(fs.existsSync(visualCompanionScripts), false, '视觉伴侣不得保留本地运行脚本');
+  const content = normalize(fs.readFileSync(visualCompanionFile, 'utf8'));
+  for (const phrase of [
+    '内置 ImageGen',
+    '直接内联展示',
+    '2～4 个',
+    '相同的画布',
+    '一次只改变一个主要变量',
+    '精确文字',
+    '项目资产',
+    '生成失败'
+  ]) {
+    assert.equal(content.includes(normalize(phrase)), true, `视觉伴侣缺少短语：${phrase}`);
+  }
+  assert.doesNotMatch(
+    content,
+    /HTML|浏览器|WebSocket|CLI|OPENAI_API_KEY|API Key|模型降级|回退路径/iu,
+    '视觉伴侣不得包含本地页面或外部回退流程'
+  );
 });
 
 for (const contract of promptContracts) {

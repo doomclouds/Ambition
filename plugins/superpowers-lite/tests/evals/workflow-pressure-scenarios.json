@@ -8,6 +8,14 @@
     "required_evidence": ["现有模式、消费者版本、失败语义、兼容性边界和恢复路径。"]
   },
   {
+    "id": "brainstorming-imagegen-comparable-options",
+    "skill": "brainstorming",
+    "pressure": "用户要比较三个仪表板视觉方向，要求高保真直观选择，同时关键中文文案和数据必须准确。",
+    "expected_decisions": ["用内置 ImageGen 生成同一画布、内容和视口下的 A/B/C 对比图，内联展示，并在对话中重述精确文案与差异。"],
+    "forbidden_decisions": ["启动本地页面服务、偷偷切换外部生成路径，或把生成图片当作精确文案与规格的唯一事实来源。"],
+    "required_evidence": ["结构化生成规格、内联图片、可比性约束、对话中的精确文字和用户选择反馈。"]
+  },
+  {
     "id": "parallel-shared-file-and-database",
     "skill": "dispatching-parallel-agents",
     "pressure": "两个候选任务都要改同一生成源并写同一测试数据库，但并行能节省一点时间。",
