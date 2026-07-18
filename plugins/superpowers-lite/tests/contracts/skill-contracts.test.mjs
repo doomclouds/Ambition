@@ -37,7 +37,7 @@ const promptContracts = [
       '任务验证通过后必须形成独立 Git 提交',
       '提交失败时返回 BLOCKED'
     ],
-    forbidden: ['每个任务都必须独立评审']
+    forbidden: ['每个任务都必须独立评审', 'absent 时附差异引用']
   },
   {
     file: path.join(skillsRoot, 'subagent-driven-development', 'task-reviewer-prompt.md'),
@@ -99,6 +99,13 @@ const referenceContracts = [
     required: ['独立故障模式', '信任边界', '不变量', '恢复边界', '逐层验证']
   }
 ];
+
+const skillForbiddenPhrases = {
+  'subagent-driven-development': [
+    '未获准时的工作区差异',
+    '没有提交权限时使用'
+  ]
+};
 
 const collectFiles = (directory) => fs.readdirSync(directory, { recursive: true, withFileTypes: true })
   .filter((entry) => entry.isFile())
@@ -191,6 +198,9 @@ for (const [skillId, requiredPhrases] of Object.entries(contracts)) {
     assert.match(withoutCodeFences(content), /[\u3400-\u9fff]/u);
     for (const phrase of requiredPhrases) {
       assert.equal(normalize(content).includes(normalize(phrase)), true, `缺少短语：${phrase}`);
+    }
+    for (const phrase of skillForbiddenPhrases[skillId] ?? []) {
+      assert.equal(normalize(content).includes(normalize(phrase)), false, `禁止短语：${phrase}`);
     }
 
     const markdownFiles = fs.readdirSync(skillDir, { recursive: true, withFileTypes: true })

@@ -53,5 +53,6 @@ NEEDS_CONTEXT 请求主代理补充权限。
 - Concerns：未决风险、限制、歧义或 none。
 - Recovery state：恢复代理或主代理下一步所需信息。
 
-最终只返回状态、单行语义证据摘要、关注点和正确报告路径。allowed 时附提交哈希；absent 时附差异引用和变更文件摘要。BLOCKED 或 NEEDS_CONTEXT 还要写明所需决定。
+最终只返回状态、单行语义证据摘要、关注点和正确报告路径。allowed 时附提交哈希；absent 只能
+返回 NEEDS_CONTEXT，确认未产生实现差异并写明所需授权。BLOCKED 还要附原始失败证据。
 ```

@@ -20,9 +20,12 @@ description: Use when 已批准计划适合由 Codex 代理分工实现，并需
 ## 持久交接
 
 - 用 `scripts/task-brief PLAN_FILE N` 生成权威任务简报。
-- 为代理指定与简报相邻的报告路径。报告保存项目意义、架构影响、语义证据、关注点、`commit_authority`，以及获准时的提交或未获准时的工作区差异。
-- 只有独立评审有净收益时才创建评审包：已提交工作使用 `scripts/review-package BASE HEAD`；没有提交权限时使用 `scripts/review-package --worktree BASE [OUTPUT]`。
-- 用 `.superpowers/sdd/progress.md` 维护进度账本，记录已接受交付、权限、提交或工作区差异、证据、关注点和下一依赖。上下文压缩后从账本和 `git log` 恢复，不靠回忆。
+- 为代理指定与简报相邻的报告路径。报告保存项目意义、架构影响、语义证据、关注点、
+  `commit_authority` 和独立任务提交；权限缺失时只记录 `NEEDS_CONTEXT` 及所需决定。
+- 只有独立评审有净收益时才创建评审包：已提交工作使用 `scripts/review-package BASE HEAD`；任务
+  没有提交权限时尚未进入实现，不生成 worktree 评审包替代任务提交。
+- 用 `.superpowers/sdd/progress.md` 维护进度账本，记录已接受交付、权限、提交、证据、关注点和
+  下一依赖。上下文压缩后从账本和 `git log` 恢复，不靠回忆。
 
 简报、报告、评审包和账本用于恢复信息，不是仪式。
 
