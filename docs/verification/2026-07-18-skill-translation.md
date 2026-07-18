@@ -464,3 +464,38 @@ foreach ($skillDir in $skillDirs) {
   固定元数据、可执行位、SHA-256 和重复构建一致性全部通过。
 - 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
   `e8ba53e188fc40c64fad252e029d4678e9a193942ed9d72a16be400f7edba47f`。
+
+---
+
+# 高风险最小护栏优化验证
+
+## 组合 RED
+
+在修改技能正文前，先为 `finishing-a-development-branch`、`receiving-code-review` 和
+`systematic-debugging` 增加最小硬护栏语义契约。`npm --prefix .\plugins\superpowers-lite test`
+得到 24 项中 21 项通过、3 项按预期失败；失败分别是缺少“合并结果上重新验证”、
+“未澄清前不得实施依赖它的反馈”和“每次新修复必须由新证据”，其他契约没有失败。
+
+## 组合 GREEN
+
+- 分支收尾增加合并后复验、仅清理当前流程所有的工作树、先移除工作树再删除分支；没有
+  恢复固定四选项或自动 push。
+- 评审处理增加耦合事项未澄清前不得修改依赖项、修复后聚焦验证，以及只在语义或风险
+  变化时再次独立评审。
+- 系统调试增加新修复必须由新证据支持，以及第二次失败、症状迁移或共享状态增强时停止
+  局部修补并重新检查根因、边界和架构假设。
+- 三个目标技能仍保持短小：分别为 21、20、30 行。
+
+## 完整验证
+
+- 最终统一审查发现并关闭 3 个 Important：区分“第二次失败触发复盘”和“架构处置由证据
+  决定”，将合并后清理条件限定到合并路径，并用完整主语—动作谓词加强契约。
+- 审查修复先得到 23/24、再得到 22/24 的预期 RED；正文修复后恢复 24/24 GREEN。
+- `npm --prefix .\plugins\superpowers-lite test`：24/24 通过。
+- 三个目标技能及完整 14 技能 `quick_validate.py`：3/3、14/14 通过。
+- 插件校验：`Plugin validation passed`；Codex-only 禁止路径扫描通过。
+- `test-runtime-scripts.sh`：全部真实 Bash 行为与路径安全测试通过。
+- `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、固定元数据、可执行位、SHA-256 和重复
+  构建一致性全部通过。
+- 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
+  `36078417298bccba1369045ecc9ab8b681841f2d5c0bcc82a3ef5f6ed3200a4f`。

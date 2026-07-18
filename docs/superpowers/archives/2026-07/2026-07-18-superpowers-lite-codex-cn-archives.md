@@ -19,6 +19,8 @@ Hook、嵌套源码和其他代理平台适配层。
 - 保留 MIT 原文以及 `BB-84C/superpowers-lite`、`obra/superpowers` 两级上游归属。
 - 增加 Codex-only 契约、真实脚本安全测试、Node 24 CI 和确定性 ZIP/tar.gz 打包链。
 - 删除主检出中的未跟踪上游导入副本，并用正式发布面扫描阻止 Hook 和非 Codex 适配残留。
+- 为分支收尾、评审反馈和系统调试补回最小高风险护栏，同时保留 Lite 的比例化触发、
+  批量执行和一次最终统一审查边界。
 
 ## Out of Scope
 
@@ -32,6 +34,9 @@ Hook、嵌套源码和其他代理平台适配层。
 - ZIP/tar.gz 白名单、时间戳、可执行位、SHA-256 和重复构建一致性测试通过。
 - 最终只读代码审查关闭 4 个 Important 与 2 个 Minor，结论为 `Ready to merge: Yes`。
 - 目录对齐后的 ZIP SHA-256：`e8ba53e188fc40c64fad252e029d4678e9a193942ed9d72a16be400f7edba47f`。
+- 高风险最小护栏优化后，Node 契约 24/24、目标技能 3/3、完整技能 14/14、真实运行脚本
+  和确定性打包全部通过；统一审查关闭 3 个 Important；ZIP SHA-256：
+  `36078417298bccba1369045ecc9ab8b681841f2d5c0bcc82a3ef5f6ed3200a4f`。
 
 ## Source Documents
 
@@ -40,6 +45,8 @@ Hook、嵌套源码和其他代理平台适配层。
 - Plan: [Superpowers Lite Codex 中文版实施计划](../../plans/2026-07-18-superpowers-lite-codex-cn.md)
 - Follow-up design: [Superpowers Lite 插件目录对齐设计](../../specs/2026-07-18-superpowers-lite-plugin-folder-alignment-design.md)
 - Follow-up plan: [Superpowers Lite 插件目录对齐实施计划](../../plans/2026-07-18-superpowers-lite-plugin-folder-alignment.md)
+- Follow-up design: [Superpowers Lite 高风险最小护栏设计](../../specs/2026-07-18-superpowers-lite-hard-guardrails-design.md)
+- Follow-up plan: [Superpowers Lite 高风险最小护栏实施计划](../../plans/2026-07-18-superpowers-lite-hard-guardrails.md)
 
 ## Related Problems
 
@@ -49,3 +56,4 @@ Hook、嵌套源码和其他代理平台适配层。
 
 - 用户批准将原计划的逐技能、逐任务评审合并为批次实施和一次最终统一审查。
 - 后续结构对齐保持相同批量执行边界，并以参考仓库的 `plugins/<plugin-name>` 所有权模型收口。
+- 护栏优化只恢复安全顺序、依赖边界和重复失败复盘点，没有回填原版长篇说明或固定阶段。
