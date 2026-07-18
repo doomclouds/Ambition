@@ -618,3 +618,38 @@ foreach ($skillDir in $skillDirs) {
 - 归档包含 60 个条目、13 个技能，SHA-256
   `9f2189722a1f3d17423bb8289ed74d628dd1eef6be67e48e9f18ef1ba813f7c7`。
 - 本轮没有 push 或 PR；本地提交保持为用户可审查的独立交付历史。
+
+---
+
+# ImageGen 视觉伴侣与 `0.1.4` 发布验证
+
+## RED / GREEN
+
+- 先增加 ImageGen-only 正文契约、视觉比较压力场景、版本期望和旧运行面移除要求。旧实现运行
+  得到 32 项中 27 项通过、5 项按预期失败：三项旧版本、一项旧脚本目录仍存在、一项主技能
+  缺少内置 ImageGen 语义。
+- 重写 `brainstorming` 的视觉伴侣，删除 5 个页面/服务运行文件并统一升级版本后，契约恢复
+  32/32 GREEN。
+- 新契约要求方案使用统一画布与输入，一次只改变一个主要变量；关键精确文字必须在对话中重述，
+  生成图片不能成为规格的唯一事实来源。
+
+## 完整验证
+
+- `npm --prefix .\plugins\superpowers-lite test`：32/32 通过。
+- 显式枚举全部技能运行 `quick_validate.py`：13/13 输出 `Skill is valid!`。
+- `validate_plugin.py .\plugins\superpowers-lite`：输出 `Plugin validation passed`。
+- `test-runtime-scripts.sh`：保留的污染定位脚本全部真实 Bash 行为测试通过。
+- `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、身份、元数据、可执行位、哈希和重复构建通过。
+- Codex-only 发布树扫描与 `git diff --check` 通过。
+
+## 正式归档
+
+- 从干净实现提交 `6d2b6444a5d777560fd7ceb0888a461bd5c7cca5` 生成
+  `superpowers-lite-0.1.4.zip`。
+- 根层只包含 `.codex-plugin/`、`assets/`、`skills/`、`README.md` 和 `LICENSE`；
+  `skills/brainstorming/scripts/` 条目为 0。
+- 归档包含 54 个条目、13 个技能，SHA-256
+  `fe0161e662e84a400748d546821a8d61b6da0fda1146d05bf8952904cf80daa2`。
+- 本轮没有生成示例视觉稿，也没有运行真实模型质量基准；验收对象是插件工作流、静态契约、
+  运行边界和发布包。
+- 本轮没有 push 或 PR。
