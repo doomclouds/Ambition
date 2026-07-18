@@ -33,7 +33,9 @@ const promptContracts = [
       '风险分类',
       '高风险前置决定',
       '未满足前置门禁时不得开始执行',
-      '普通任务不需要自行创建独立评审流程'
+      '普通任务不需要自行创建独立评审流程',
+      '任务验证通过后必须形成独立 Git 提交',
+      '提交失败时返回 BLOCKED'
     ],
     forbidden: ['每个任务都必须独立评审']
   },
@@ -54,10 +56,47 @@ const promptContracts = [
       '需求、跨任务一致性',
       '兼容、失败路径、回归和遗留风险',
       '不能仅因实现没有逐字遵循计划',
+      '数据迁移与回滚',
+      '并发与共享状态',
+      '错误处理、失败传播与恢复',
+      '测试是否验证真实行为',
+      '文件与行号',
       '按依赖集中修复',
-      '组合复验'
+      '组合复验',
+      'Ready to merge: Yes | With fixes | No'
     ],
     forbidden: ['只检查单个任务']
+  }
+];
+
+const referenceContracts = [
+  {
+    file: path.join(skillsRoot, 'test-driven-development', 'test-selection-patterns.md'),
+    required: [
+      '纯逻辑与不变量',
+      '状态、持久化与重启',
+      '并发、时间与随机性',
+      '迁移、兼容与回滚',
+      '测试替身'
+    ]
+  },
+  {
+    file: path.join(skillsRoot, 'verification-before-completion', 'evidence-matrix.md'),
+    required: [
+      '声明—证据矩阵',
+      '完整命令',
+      '原始症状',
+      '代表性消费者',
+      '代理报告'
+    ]
+  },
+  {
+    file: path.join(skillsRoot, 'systematic-debugging', 'root-cause-tracing.md'),
+    required: ['边界表', '值或状态', '调用链', '证据断点', '停止条件']
+  },
+  {
+    file: path.join(skillsRoot, 'systematic-debugging', 'defense-in-depth.md'),
+    required: ['独立故障模式', '信任边界', '不变量', '恢复边界', '逐层验证']
   }
 ];
 
@@ -124,6 +163,16 @@ for (const contract of promptContracts) {
     }
     for (const phrase of contract.forbidden) {
       assert.equal(content.includes(normalize(phrase)), false, `禁止短语：${phrase}`);
+    }
+  });
+}
+
+for (const contract of referenceContracts) {
+  test(`${path.relative(root, contract.file)} 深度参考契约有效`, () => {
+    assert.equal(fs.existsSync(contract.file), true, `${contract.file} 必须存在`);
+    const content = normalize(fs.readFileSync(contract.file, 'utf8'));
+    for (const phrase of contract.required) {
+      assert.equal(content.includes(normalize(phrase)), true, `缺少短语：${phrase}`);
     }
   });
 }
