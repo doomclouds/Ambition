@@ -535,3 +535,25 @@ foreach ($skillDir in $skillDirs) {
   构建一致性全部通过。
 - 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
   `b6b2ca8006fb3d46eef4f92e67f42066bc94164909b520085d192a08b8408ef6`。
+
+---
+
+# `writing-skills` 删除与 `0.1.1` 发布验证
+
+## 契约 RED / GREEN
+
+- 先把 manifest、marketplace 版本期望更新为 `0.1.1`，并从精确技能清单和语义契约中
+  删除 `writing-skills`。首次运行得到 26 项中 23 项通过、3 项按预期失败：两项旧版本
+  `0.1.0`，一项目录集合仍包含 `writing-skills`。
+- 更新三处发布版本并删除 `skills/writing-skills/` 的 6 个文件后，契约恢复 26/26 GREEN。
+
+## 完整验证
+
+- `npm --prefix .\plugins\superpowers-lite test`：26/26 通过。
+- 显式完整 13 技能 `quick_validate.py`：13/13 输出 `Skill is valid!`。
+- `validate_plugin.py .\plugins\superpowers-lite`：`Plugin validation passed`。
+- `test-runtime-scripts.sh`：全部真实 Bash 行为与路径安全测试通过。
+- `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、固定元数据、可执行位、SHA-256 和重复
+  构建一致性全部通过。
+- 正式归档从已提交的 `f2d5857` 生成：`superpowers-lite-0.1.1.zip`，58 个条目、
+  13 个技能，SHA-256 `6df88af55304d5de0359fa62e4b04900dcf13229c5857e1d930d05abda0d610e`。

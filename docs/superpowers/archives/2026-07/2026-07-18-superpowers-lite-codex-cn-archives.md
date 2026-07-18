@@ -9,12 +9,12 @@
 ## Summary
 
 仓库使用 marketplace + `plugins/` 布局公开独立的 `superpowers-lite` Codex 插件：
-保留 Lite 工作流的核心语义和 14 个稳定技能 ID，将公开人类可读内容中文化，并移除
+保留 Lite 工作流的核心语义和 13 个稳定技能 ID，将公开人类可读内容中文化，并移除
 Hook、嵌套源码和其他代理平台适配层。
 
 ## Delivered Scope
 
-- 在 `plugins/superpowers-lite/` 建立自包含 manifest、图标、14 个中文技能、测试和打包链，
+- 在 `plugins/superpowers-lite/` 建立自包含 manifest、图标、13 个中文技能、测试和打包链，
   由根 `.agents/plugins/marketplace.json` 使用 local source path 定位。
 - 保留 MIT 原文以及 `BB-84C/superpowers-lite`、`obra/superpowers` 两级上游归属。
 - 增加 Codex-only 契约、真实脚本安全测试、Node 24 CI 和确定性 ZIP/tar.gz 打包链。
@@ -37,6 +37,9 @@ Hook、嵌套源码和其他代理平台适配层。
 - 高风险最小护栏优化后，Node 契约 24/24、目标技能 3/3、完整技能 14/14、真实运行脚本
   和确定性打包全部通过；统一审查关闭 3 个 Important；ZIP SHA-256：
   `36078417298bccba1369045ecc9ab8b681841f2d5c0bcc82a3ef5f6ed3200a4f`。
+- `0.1.1` 移除 `writing-skills` 后，Node 契约 26/26、剩余技能 13/13、运行脚本、
+  Codex-only 打包测试和插件校验全部通过；58 条目 ZIP SHA-256：
+  `6df88af55304d5de0359fa62e4b04900dcf13229c5857e1d930d05abda0d610e`。
 
 ## Source Documents
 
@@ -57,3 +60,4 @@ Hook、嵌套源码和其他代理平台适配层。
 - 用户批准将原计划的逐技能、逐任务评审合并为批次实施和一次最终统一审查。
 - 后续结构对齐保持相同批量执行边界，并以参考仓库的 `plugins/<plugin-name>` 所有权模型收口。
 - 护栏优化只恢复安全顺序、依赖边界和重复失败复盘点，没有回填原版长篇说明或固定阶段。
+- `0.1.1` 按用户要求删除不再需要的 `writing-skills`，发布面由 14 个技能收敛为 13 个。
