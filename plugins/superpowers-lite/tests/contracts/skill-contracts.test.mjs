@@ -23,8 +23,7 @@ const expectedSkills = [
   'using-git-worktrees',
   'using-superpowers',
   'verification-before-completion',
-  'writing-plans',
-  'writing-skills'
+  'writing-plans'
 ];
 
 const promptContracts = [
