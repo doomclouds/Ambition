@@ -27,6 +27,41 @@ const expectedSkills = [
   'writing-skills'
 ];
 
+const promptContracts = [
+  {
+    file: path.join(skillsRoot, 'subagent-driven-development', 'implementer-prompt.md'),
+    required: [
+      '风险分类',
+      '高风险前置决定',
+      '未满足前置门禁时不得开始执行',
+      '普通任务不需要自行创建独立评审流程'
+    ],
+    forbidden: ['每个任务都必须独立评审']
+  },
+  {
+    file: path.join(skillsRoot, 'subagent-driven-development', 'task-reviewer-prompt.md'),
+    required: [
+      '高风险例外',
+      '只审该风险，不进行完整规格审查与质量审查',
+      '评审阶段',
+      '操作方案、授权和回滚或恢复路径',
+      '不能替代全部任务完成后的最终统一审查'
+    ],
+    forbidden: ['检查全部需求']
+  },
+  {
+    file: path.join(skillsRoot, 'requesting-code-review', 'code-reviewer.md'),
+    required: [
+      '需求、跨任务一致性',
+      '兼容、失败路径、回归和遗留风险',
+      '不能仅因实现没有逐字遵循计划',
+      '按依赖集中修复',
+      '组合复验'
+    ],
+    forbidden: ['只检查单个任务']
+  }
+];
+
 const collectFiles = (directory) => fs.readdirSync(directory, { recursive: true, withFileTypes: true })
   .filter((entry) => entry.isFile())
   .map((entry) => path.join(entry.parentPath, entry.name));
@@ -81,6 +116,18 @@ test('正式发布脚本的已知用户可见错误均已中文化', () => {
     assert.equal(packageScript.includes(marker), true, `打包脚本缺少中文用户文案：${marker}`);
   }
 });
+
+for (const contract of promptContracts) {
+  test(`${path.relative(root, contract.file)} 提示模板契约有效`, () => {
+    const content = normalize(fs.readFileSync(contract.file, 'utf8'));
+    for (const phrase of contract.required) {
+      assert.equal(content.includes(normalize(phrase)), true, `缺少短语：${phrase}`);
+    }
+    for (const phrase of contract.forbidden) {
+      assert.equal(content.includes(normalize(phrase)), false, `禁止短语：${phrase}`);
+    }
+  });
+}
 
 for (const [skillId, requiredPhrases] of Object.entries(contracts)) {
   test(`${skillId} 中文技能契约有效`, () => {
