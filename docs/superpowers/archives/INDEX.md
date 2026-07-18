@@ -2,6 +2,7 @@
 
 ## 2026-07
 
+- [2026-07-18-superpowers-lite-adaptive-brainstorming-archives.md](./2026-07/2026-07-18-superpowers-lite-adaptive-brainstorming-archives.md): 让头脑风暴主动展开候选空间、推荐方向并等待用户确认，同时保留 GPT-5.6 的自适应判断和轻量流程。
 - [2026-07-18-superpowers-lite-autonomous-sdd-review-archives.md](./2026-07/2026-07-18-superpowers-lite-autonomous-sdd-review-archives.md): 将计划改为可调整的意图契约，普通子任务连续执行，高风险事前门禁并在全部任务后统一严格审查。
 - [2026-07-18-superpowers-lite-codex-cn-archives.md](./2026-07/2026-07-18-superpowers-lite-codex-cn-archives.md): 通过 `Ambition` marketplace 交付仅面向 Codex CLI/App 的 `0.1.2` 中文插件，包含 13 个技能、无 Hook 运行面和可复现 rootless 归档。
 - [2026-07-18-superpowers-lite-imagegen-visual-companion-archives.md](./2026-07/2026-07-18-superpowers-lite-imagegen-visual-companion-archives.md): 将头脑风暴视觉伴侣改为内置 ImageGen 高保真图片与对话内联展示，删除本地页面服务和全部外部生成路径。
