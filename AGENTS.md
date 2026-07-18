@@ -1,5 +1,12 @@
 # AGENTS
 
+## Repository Context
+
+这是一个仅面向 Codex 的 Superpowers Lite 中文插件。仅保留 `.codex-plugin/`、
+`.agents/plugins/`、`assets/` 和 `skills/` 作为插件交付面；不要引入其他代理平台
+的适配器、hooks、apps 或 MCP 配置。每个技能先保持中文、可验证且按任务风险比例
+适配，再扩展覆盖范围。
+
 <!-- asset-compounding-guidance:start -->
 <!-- asset-compounding-guidance:version=0.3.1 -->
 ## Asset Compounding Retrieval Guide

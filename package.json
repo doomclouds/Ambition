@@ -1,0 +1,14 @@
+{
+  "name": "superpowers-lite",
+  "version": "0.1.0",
+  "description": "面向 Codex 的风险适配型工程工作流技能集。",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    ".codex-plugin",
+    "assets",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ]
+}
