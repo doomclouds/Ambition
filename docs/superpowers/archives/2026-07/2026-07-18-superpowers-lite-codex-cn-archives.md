@@ -8,14 +8,14 @@
 
 ## Summary
 
-仓库使用 marketplace + `plugins/` 布局公开独立的 `superpowers-lite` Codex 插件：
+仓库使用名为 `Ambition` 的 marketplace + `plugins/` 布局公开独立的 `superpowers-lite` Codex 插件：
 保留 Lite 工作流的核心语义和 13 个稳定技能 ID，将公开人类可读内容中文化，并移除
 Hook、嵌套源码和其他代理平台适配层。
 
 ## Delivered Scope
 
 - 在 `plugins/superpowers-lite/` 建立自包含 manifest、图标、13 个中文技能、测试和打包链，
-  由根 `.agents/plugins/marketplace.json` 使用 local source path 定位。
+  由根 `.agents/plugins/marketplace.json` 以 `Ambition` 为商城名并使用 local source path 定位。
 - 保留 MIT 原文以及 `BB-84C/superpowers-lite`、`obra/superpowers` 两级上游归属。
 - 增加 Codex-only 契约、真实脚本安全测试、Node 24 CI 和确定性 ZIP/tar.gz 打包链。
 - 删除主检出中的未跟踪上游导入副本，并用正式发布面扫描阻止 Hook 和非 Codex 适配残留。
@@ -40,6 +40,9 @@ Hook、嵌套源码和其他代理平台适配层。
 - `0.1.1` 移除 `writing-skills` 后，Node 契约 26/26、剩余技能 13/13、运行脚本、
   Codex-only 打包测试和插件校验全部通过；58 条目 ZIP SHA-256：
   `6df88af55304d5de0359fa62e4b04900dcf13229c5857e1d930d05abda0d610e`。
+- `0.1.2` 将 marketplace 机器名和展示名统一为仓库名 `Ambition`，安装入口改为
+  `superpowers-lite@Ambition`；完整验证通过，58 条目 ZIP SHA-256：
+  `ebd522bb8839f828a884590e2c560527af1f60b818aa7c1d6e00c0b67a6e1ccc`。
 
 ## Source Documents
 
@@ -61,3 +64,4 @@ Hook、嵌套源码和其他代理平台适配层。
 - 后续结构对齐保持相同批量执行边界，并以参考仓库的 `plugins/<plugin-name>` 所有权模型收口。
 - 护栏优化只恢复安全顺序、依赖边界和重复失败复盘点，没有回填原版长篇说明或固定阶段。
 - `0.1.1` 按用户要求删除不再需要的 `writing-skills`，发布面由 14 个技能收敛为 13 个。
+- `0.1.2` 按用户要求让 marketplace 名称与仓库名保持一致，插件 ID 本身仍为 `superpowers-lite`。

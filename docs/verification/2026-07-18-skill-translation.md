@@ -557,3 +557,25 @@ foreach ($skillDir in $skillDirs) {
   构建一致性全部通过。
 - 正式归档从已提交的 `f2d5857` 生成：`superpowers-lite-0.1.1.zip`，58 个条目、
   13 个技能，SHA-256 `6df88af55304d5de0359fa62e4b04900dcf13229c5857e1d930d05abda0d610e`。
+
+---
+
+# marketplace 更名与 `0.1.2` 发布验证
+
+## 契约 RED / GREEN
+
+- 先把 marketplace 名称期望改为仓库原名 `Ambition`，把三处发布版本期望改为 `0.1.2`，
+  并要求仓库与插件 README 使用 `superpowers-lite@Ambition`。首次运行得到 26 项中 23 项
+  通过、3 项按预期失败：旧 manifest 版本、旧商城名和旧安装命令分别被命中。
+- marketplace 机器名与展示名改为 `Ambition`，manifest、package 和商城条目升至 `0.1.2`，
+  两份安装文档同步后恢复 26/26 GREEN；插件 ID 与 source path 保持不变。
+
+## 完整验证
+
+- `npm --prefix .\plugins\superpowers-lite test`：26/26 通过。
+- `read_marketplace_name.py --marketplace-path .\.agents\plugins\marketplace.json`：输出 `Ambition`。
+- 显式完整 13 技能 `quick_validate.py`：13/13 输出 `Skill is valid!`。
+- `validate_plugin.py .\plugins\superpowers-lite`：`Plugin validation passed`。
+- `test-runtime-scripts.sh` 与 `test-package-codex-plugin.sh`：全部通过。
+- 正式归档从已提交的 `abea9de` 生成：`superpowers-lite-0.1.2.zip`，58 个条目、
+  13 个技能，SHA-256 `ebd522bb8839f828a884590e2c560527af1f60b818aa7c1d6e00c0b67a6e1ccc`。
