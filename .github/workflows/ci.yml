@@ -10,6 +10,9 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugins/superpowers-lite
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

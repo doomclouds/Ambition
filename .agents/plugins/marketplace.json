@@ -8,8 +8,8 @@
       "name": "superpowers-lite",
       "version": "0.1.0",
       "source": {
-        "source": "url",
-        "url": "./"
+        "source": "local",
+        "path": "./plugins/superpowers-lite"
       },
       "policy": {
         "installation": "AVAILABLE",

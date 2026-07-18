@@ -3,15 +3,28 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = path.resolve(import.meta.dirname, '..', '..');
-const readJson = (relativePath) =>
-  JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8'));
+const pluginRoot = path.resolve(import.meta.dirname, '..', '..');
+const repoRoot = path.resolve(pluginRoot, '..', '..');
+const readPluginJson = (relativePath) =>
+  JSON.parse(fs.readFileSync(path.join(pluginRoot, relativePath), 'utf8'));
+const readRepoJson = (relativePath) =>
+  JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 const hasChinese = (value) => /[\u3400-\u9fff]/u.test(String(value));
-const readText = (relativePath) =>
-  fs.readFileSync(path.join(root, relativePath), 'utf8');
+const readPluginText = (relativePath) =>
+  fs.readFileSync(path.join(pluginRoot, relativePath), 'utf8');
+const readRepoText = (relativePath) =>
+  fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
+
+test('插件发布面位于批准的 plugins 子目录', () => {
+  assert.equal(path.basename(pluginRoot), 'superpowers-lite');
+  assert.equal(path.basename(path.dirname(pluginRoot)), 'plugins');
+  for (const oldRoot of ['.codex-plugin', 'assets', 'skills', 'scripts', 'tests', 'package.json']) {
+    assert.equal(fs.existsSync(path.join(repoRoot, oldRoot)), false, `仓库根不得保留 ${oldRoot}`);
+  }
+});
 
 test('Codex 清单使用批准的身份且不声明 hooks', () => {
-  const manifest = readJson('.codex-plugin/plugin.json');
+  const manifest = readPluginJson('.codex-plugin/plugin.json');
   assert.equal(manifest.name, 'superpowers-lite');
   assert.equal(manifest.version, '0.1.0');
   assert.equal(manifest.repository, 'https://github.com/doomclouds/Ambition');
@@ -27,12 +40,15 @@ test('Codex 清单使用批准的身份且不声明 hooks', () => {
 });
 
 test('市场清单只公开一个本地 superpowers-lite 条目', () => {
-  const marketplace = readJson('.agents/plugins/marketplace.json');
+  const marketplace = readRepoJson('.agents/plugins/marketplace.json');
   assert.equal(marketplace.name, 'superpowers-lite');
   const entries = marketplace.plugins.filter((item) => item.name === 'superpowers-lite');
   assert.equal(entries.length, 1);
   assert.equal(entries[0].version, '0.1.0');
-  assert.deepEqual(entries[0].source, { source: 'url', url: './' });
+  assert.deepEqual(entries[0].source, {
+    source: 'local',
+    path: './plugins/superpowers-lite'
+  });
   assert.deepEqual(entries[0].policy, {
     installation: 'AVAILABLE',
     authentication: 'ON_INSTALL'
@@ -41,17 +57,17 @@ test('市场清单只公开一个本地 superpowers-lite 条目', () => {
 });
 
 test('许可证存在且仓库根层保持 Codex-only', () => {
-  const license = readText('LICENSE');
+  const license = readPluginText('LICENSE');
   assert.match(license, /MIT License/);
   for (const relativePath of [
     'hooks', '.claude-plugin', '.cursor-plugin', '.kimi-plugin', '.opencode', '.pi'
   ]) {
-    assert.equal(fs.existsSync(path.join(root, relativePath)), false, `${relativePath} 必须不存在`);
+    assert.equal(fs.existsSync(path.join(pluginRoot, relativePath)), false, `${relativePath} 必须不存在`);
   }
 });
 
 test('中文公开文档保留安装边界和上游归属', () => {
-  const readme = readText('README.md');
+  const readme = readPluginText('README.md');
   for (const marker of [
     'MIT',
     'BB-84C/superpowers-lite',
@@ -67,12 +83,12 @@ test('中文公开文档保留安装边界和上游归属', () => {
   assert.match(readme, /不包含 `\.agents\/plugins\/marketplace\.json`/);
   assert.match(readme, /不能直接作为 marketplace 根目录/);
 
-  const security = readText('SECURITY.md');
+  const security = readPluginText('SECURITY.md');
   assert.equal(hasChinese(security), true);
   assert.match(security, /本地数据/);
   assert.match(security, /https:\/\/github\.com\/doomclouds\/Ambition\/security\/advisories\/new/);
 
-  const contributing = readText('CONTRIBUTING.md');
+  const contributing = readPluginText('CONTRIBUTING.md');
   assert.equal(hasChinese(contributing), true);
   for (const marker of ['英文代码注释', '技能 ID', 'RED', 'GREEN', 'Conventional Commits']) {
     assert.match(contributing, new RegExp(marker));
@@ -80,7 +96,7 @@ test('中文公开文档保留安装边界和上游归属', () => {
 });
 
 test('发布白名单和 CI 保持 Codex-only', () => {
-  const packageJson = readJson('package.json');
+  const packageJson = readPluginJson('package.json');
   assert.deepEqual(packageJson.files, [
     '.codex-plugin',
     'assets',
@@ -93,8 +109,9 @@ test('发布白名单和 CI 保持 Codex-only', () => {
     'node --test tests/contracts/plugin-contracts.test.mjs tests/contracts/skill-contracts.test.mjs'
   );
 
-  const workflow = readText('.github/workflows/ci.yml');
+  const workflow = readRepoText('.github/workflows/ci.yml');
   assert.match(workflow, /node-version:\s*24/);
+  assert.match(workflow, /working-directory:\s*plugins\/superpowers-lite/);
   const npmTestIndex = workflow.indexOf('run: npm test');
   const packageTestIndex = workflow.indexOf('run: bash tests/codex/test-package-codex-plugin.sh');
   const runtimeTestIndex = workflow.indexOf('run: bash tests/codex/test-runtime-scripts.sh');
@@ -105,7 +122,7 @@ test('发布白名单和 CI 保持 Codex-only', () => {
   assert.ok(runtimeTestIndex < packageTestIndex, 'CI 必须先验证运行脚本再验证打包');
   assert.doesNotMatch(workflow, /hooks|claude|cursor|kimi|opencode|\.pi|antigravity/i);
 
-  const attributes = readText('.gitattributes');
+  const attributes = readRepoText('.gitattributes');
   assert.match(attributes, /^\*\.sh text eol=lf$/m);
-  assert.match(attributes, /^skills\/\*\*\/scripts\/\* text eol=lf$/m);
+  assert.match(attributes, /^plugins\/superpowers-lite\/skills\/\*\*\/scripts\/\* text eol=lf$/m);
 });

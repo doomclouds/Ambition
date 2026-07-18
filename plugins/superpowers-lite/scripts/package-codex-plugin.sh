@@ -4,7 +4,9 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PLUGIN_PATH="plugins/superpowers-lite"
+REPO_ROOT=""
 
 REF="HEAD"
 OUTPUT=""
@@ -97,6 +99,8 @@ command -v tar >/dev/null || die "PATH 中找不到 tar"
 command -v python3 >/dev/null || die "PATH 中找不到 python3"
 command -v sha256sum >/dev/null || die "PATH 中找不到 sha256sum"
 
+REPO_ROOT="$(git -C "$PLUGIN_ROOT" rev-parse --show-toplevel 2>/dev/null)" ||
+  die "无法定位 Git 仓库根目录：$PLUGIN_ROOT"
 git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
   die "不是 Git 工作区：$REPO_ROOT"
 git -C "$REPO_ROOT" rev-parse --verify "$REF^{commit}" >/dev/null 2>&1 ||
@@ -127,11 +131,11 @@ trap cleanup EXIT
 
 mkdir -p "$STAGE"
 
-git -C "$REPO_ROOT" archive --format=tar "$REF" -- \
+git -C "$REPO_ROOT" archive --format=tar "$REF:$PLUGIN_PATH" -- \
   .codex-plugin LICENSE README.md assets skills |
   tar -xf - -C "$STAGE"
 
-git -C "$REPO_ROOT" ls-tree -r "$REF" -- \
+git -C "$REPO_ROOT" ls-tree -r "$REF:$PLUGIN_PATH" -- \
   .codex-plugin LICENSE README.md assets skills |
   awk -F '\t' '{ split($1, fields, " "); print fields[1], $2 }' >"$GIT_MODE_MAP"
 
