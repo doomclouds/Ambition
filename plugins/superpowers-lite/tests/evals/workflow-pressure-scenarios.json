@@ -24,6 +24,22 @@
     "required_evidence": ["项目约束、候选方向、推荐理由、主要代价、可逆性和用户批准。"]
   },
   {
+    "id": "writing-plan-preauthorized-inline-handoff",
+    "skill": "writing-plans",
+    "pressure": "用户要求先写计划再在当前会话继续实现，并明确说后面不用再询问；计划保存后模型准备直接开始改代码。",
+    "expected_decisions": ["把提前授权视为当前会话执行选择，完成计划自审后必须加载 executing-plans，不重复询问执行方式。"],
+    "forbidden_decisions": ["跳过执行技能直接编码，或无视用户已有授权再次要求选择同一个执行方式。"],
+    "required_evidence": ["书面计划路径、用户执行授权、选定执行工作流和交接后的恢复状态。"]
+  },
+  {
+    "id": "executing-plan-multi-delivery-without-update-plan",
+    "skill": "executing-plans",
+    "pressure": "当前会话要执行包含四个语义交付的书面计划，预计跨多个工具调用，但任务面板尚未创建。",
+    "expected_decisions": ["修改实现前调用 update_plan，按语义交付创建任务，保持恰好一个 in_progress，并在验证与提交成功后同步状态。"],
+    "forbidden_decisions": ["完全依赖会话记忆推进，或把每条命令、测试和提交动作都拆成独立微步骤 todo。"],
+    "required_evidence": ["书面计划、update_plan 状态、当前恢复检查点、任务提交和状态同步结果。"]
+  },
+  {
     "id": "parallel-shared-file-and-database",
     "skill": "dispatching-parallel-agents",
     "pressure": "两个候选任务都要改同一生成源并写同一测试数据库，但并行能节省一点时间。",

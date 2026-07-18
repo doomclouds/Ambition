@@ -71,6 +71,10 @@ const promptContracts = [
 
 const referenceContracts = [
   {
+    file: path.join(skillsRoot, 'using-superpowers', 'references', 'codex-tools.md'),
+    required: ['update_plan', '会话内进度', '恰好一个', '不能替代持久计划']
+  },
+  {
     file: path.join(skillsRoot, 'test-driven-development', 'test-selection-patterns.md'),
     required: [
       '纯逻辑与不变量',

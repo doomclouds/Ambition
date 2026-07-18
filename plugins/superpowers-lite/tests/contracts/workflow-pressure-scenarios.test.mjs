@@ -12,6 +12,8 @@ const requiredScenarioIds = [
   'brainstorming-open-decision-with-migration',
   'brainstorming-imagegen-comparable-options',
   'brainstorming-premature-convergence-without-approval',
+  'writing-plan-preauthorized-inline-handoff',
+  'executing-plan-multi-delivery-without-update-plan',
   'parallel-shared-file-and-database',
   'executing-plan-drift-after-compaction',
   'finishing-detached-uncommitted',
