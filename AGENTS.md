@@ -2,19 +2,21 @@
 
 ## Repository Context
 
-这是一个仅面向 Codex 的 Superpowers Lite 中文插件。仅保留 `.codex-plugin/`、
-`.agents/plugins/`、`assets/` 和 `skills/` 作为插件交付面；不要引入其他代理平台
-的适配器、hooks、apps 或 MCP 配置。每个技能先保持中文、可验证且按任务风险比例
-适配，再扩展覆盖范围。
+插件包位于 `plugins/superpowers-lite/`；仓库 marketplace 位于
+`.agents/plugins/marketplace.json`，其 source path 必须保持
+`./plugins/superpowers-lite`。插件仅面向 Codex，不要引入其他代理平台的适配器、
+hooks、apps 或 MCP 配置。每个技能先保持中文、可验证且按任务风险比例适配，再扩展覆盖范围。
 
 ## Validation and Packaging
 
-面向 Codex 的结构与技能契约统一通过 `npm test` 运行。Windows 本机执行中文技能
+面向 Codex 的结构与技能契约统一通过
+`npm --prefix .\plugins\superpowers-lite test` 运行。Windows 本机执行中文技能
 校验前设置 `PYTHONIOENCODING=utf-8` 和 `PYTHONUTF8=1`。归档测试使用明确的 Git
 Bash 路径运行：
 
 ```powershell
-& 'C:\Program Files\Git\bin\bash.exe' .\tests\codex\test-package-codex-plugin.sh
+& 'C:\Program Files\Git\bin\bash.exe' .\plugins\superpowers-lite\tests\codex\test-runtime-scripts.sh
+& 'C:\Program Files\Git\bin\bash.exe' .\plugins\superpowers-lite\tests\codex\test-package-codex-plugin.sh
 ```
 
 正式归档必须由干净且已提交的 `HEAD` 生成。归档根层只允许 `.codex-plugin/`、

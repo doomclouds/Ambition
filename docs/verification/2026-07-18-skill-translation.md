@@ -440,3 +440,27 @@ foreach ($skillDir in $skillDirs) {
 - 显式 14 技能 `quick_validate.py`：14/14 输出 `Skill is valid!`。
 - Node/Shell 语法检查与 `git diff --check`：通过。
 - `tests/codex/test-package-codex-plugin.sh`：提交后验证结果与最终 SHA-256 记录在 `.superpowers/sdd/final-review-fixes-report.md`，归档仍只读取发布白名单。
+
+---
+
+# 插件目录结构对齐验证
+
+## 结构 RED
+
+在迁移前增加“插件发布面必须位于 `plugins/superpowers-lite`”契约。旧根布局运行
+`node --test .\tests\contracts\plugin-contracts.test.mjs` 时 6 项中 5 项通过、1 项按预期失败，
+实际根目录名为 worktree 名而不是 `superpowers-lite`，证明契约能识别根插件布局。
+
+## 迁移 GREEN
+
+- marketplace source 改为 `local` + `./plugins/superpowers-lite`。
+- `.codex-plugin`、assets、skills、scripts、tests、package 和插件公开文档已归入
+  `plugins/superpowers-lite/`；仓库根只保留 marketplace、CI、项目资产和导航。
+- `npm --prefix .\plugins\superpowers-lite test`：24/24 通过。
+- `plugins/superpowers-lite/tests/codex/test-runtime-scripts.sh`：全部通过。
+- `validate_plugin.py .\plugins\superpowers-lite`：`Plugin validation passed`。
+- 显式 14 技能 `quick_validate.py`：14/14 输出 `Skill is valid!`。
+- `plugins/superpowers-lite/tests/codex/test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、
+  固定元数据、可执行位、SHA-256 和重复构建一致性全部通过。
+- 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
+  `e8ba53e188fc40c64fad252e029d4678e9a193942ed9d72a16be400f7edba47f`。
