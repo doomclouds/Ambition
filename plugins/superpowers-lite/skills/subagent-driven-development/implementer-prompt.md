@@ -32,7 +32,11 @@
 ## commit_authority
 [allowed | absent]
 
-只有任务上下文明确写明 allowed 才可提交；absent 时禁止提交，保留并报告工作区差异、变更文件和证据。
+只有任务上下文明确写明 allowed 才可修改和提交；absent 时不要产生实现差异，返回
+NEEDS_CONTEXT 请求主代理补充权限。
+
+任务验证通过后必须形成独立 Git 提交。只暂存本任务拥有的文件，检查 staged diff，使用能说明
+交付行为的提交信息。提交失败时返回 BLOCKED，报告原始错误；不得把未提交差异标成 DONE。
 
 ## 报告
 把完整报告写入：[REPORT_FILE]
@@ -42,7 +46,7 @@
 - Project meaning：交付服务的用户或运维结果。
 - Architecture impact：修改或保留的模块、边界、数据/控制流与契约。
 - commit_authority：allowed 或 absent 及来源。
-- Implementation：完成内容；allowed 时列提交，absent 时列工作区差异和文件。
+- Implementation：完成内容、独立任务提交和精确变更文件。
 - Plan deviation：相对候选步骤的实质调整、原因和证据；没有则写 none。
 - Semantic evidence：场景、命令/回读/工件、观察结果和通过/失败含义。
 - Downstream impact：后续任务可以依赖什么，以及仍不能依赖什么。
