@@ -35,8 +35,8 @@ Hook、嵌套源码和其他代理平台适配层。
 - 最终只读代码审查关闭 4 个 Important 与 2 个 Minor，结论为 `Ready to merge: Yes`。
 - 目录对齐后的 ZIP SHA-256：`e8ba53e188fc40c64fad252e029d4678e9a193942ed9d72a16be400f7edba47f`。
 - 高风险最小护栏优化后，Node 契约 24/24、目标技能 3/3、完整技能 14/14、真实运行脚本
-  和确定性打包全部通过；ZIP SHA-256：
-  `fd0176dc5e6c52f84e7eef45df047ed297d011c0d5cb34a97436d1ce0ac6b449`。
+  和确定性打包全部通过；统一审查关闭 3 个 Important；ZIP SHA-256：
+  `36078417298bccba1369045ecc9ab8b681841f2d5c0bcc82a3ef5f6ed3200a4f`。
 
 ## Source Documents
 

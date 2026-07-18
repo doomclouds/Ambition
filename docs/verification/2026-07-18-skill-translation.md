@@ -488,6 +488,9 @@ foreach ($skillDir in $skillDirs) {
 
 ## 完整验证
 
+- 最终统一审查发现并关闭 3 个 Important：区分“第二次失败触发复盘”和“架构处置由证据
+  决定”，将合并后清理条件限定到合并路径，并用完整主语—动作谓词加强契约。
+- 审查修复先得到 23/24、再得到 22/24 的预期 RED；正文修复后恢复 24/24 GREEN。
 - `npm --prefix .\plugins\superpowers-lite test`：24/24 通过。
 - 三个目标技能及完整 14 技能 `quick_validate.py`：3/3、14/14 通过。
 - 插件校验：`Plugin validation passed`；Codex-only 禁止路径扫描通过。
@@ -495,4 +498,4 @@ foreach ($skillDir in $skillDirs) {
 - `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、固定元数据、可执行位、SHA-256 和重复
   构建一致性全部通过。
 - 正式 rootless ZIP：65 个条目、14 个技能，SHA-256
-  `fd0176dc5e6c52f84e7eef45df047ed297d011c0d5cb34a97436d1ce0ac6b449`。
+  `36078417298bccba1369045ecc9ab8b681841f2d5c0bcc82a3ef5f6ed3200a4f`。
