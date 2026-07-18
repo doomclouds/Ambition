@@ -1,12 +1,12 @@
 {
-  "name": "superpowers-lite",
+  "name": "Ambition",
   "interface": {
-    "displayName": "Superpowers Lite"
+    "displayName": "Ambition"
   },
   "plugins": [
     {
       "name": "superpowers-lite",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "source": {
         "source": "local",
         "path": "./plugins/superpowers-lite"

@@ -10,7 +10,7 @@
 
 ```powershell
 codex plugin marketplace add <仓库根目录>
-codex plugin add superpowers-lite@superpowers-lite
+codex plugin add superpowers-lite@Ambition
 ```
 
 marketplace 清单位于 `.agents/plugins/marketplace.json`，插件源码位于

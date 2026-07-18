@@ -26,7 +26,7 @@ test('插件发布面位于批准的 plugins 子目录', () => {
 test('Codex 清单使用批准的身份且不声明 hooks', () => {
   const manifest = readPluginJson('.codex-plugin/plugin.json');
   assert.equal(manifest.name, 'superpowers-lite');
-  assert.equal(manifest.version, '0.1.1');
+  assert.equal(manifest.version, '0.1.2');
   assert.equal(manifest.repository, 'https://github.com/doomclouds/Ambition');
   assert.equal(manifest.author?.name, 'doomclouds');
   assert.equal(manifest.skills, './skills/');
@@ -41,10 +41,11 @@ test('Codex 清单使用批准的身份且不声明 hooks', () => {
 
 test('市场清单只公开一个本地 superpowers-lite 条目', () => {
   const marketplace = readRepoJson('.agents/plugins/marketplace.json');
-  assert.equal(marketplace.name, 'superpowers-lite');
+  assert.equal(marketplace.name, 'Ambition');
+  assert.equal(marketplace.interface?.displayName, 'Ambition');
   const entries = marketplace.plugins.filter((item) => item.name === 'superpowers-lite');
   assert.equal(entries.length, 1);
-  assert.equal(entries[0].version, '0.1.1');
+  assert.equal(entries[0].version, '0.1.2');
   assert.deepEqual(entries[0].source, {
     source: 'local',
     path: './plugins/superpowers-lite'
@@ -85,9 +86,12 @@ test('中文公开文档保留安装边界和上游归属', () => {
   }
   assert.equal(hasChinese(readme), true);
   assert.match(readme, /codex plugin marketplace add <仓库根目录>/);
-  assert.match(readme, /codex plugin add superpowers-lite@superpowers-lite/);
+  assert.match(readme, /codex plugin add superpowers-lite@Ambition/);
   assert.match(readme, /不包含 `\.agents\/plugins\/marketplace\.json`/);
   assert.match(readme, /不能直接作为 marketplace 根目录/);
+
+  const repoReadme = readRepoText('README.md');
+  assert.match(repoReadme, /codex plugin add superpowers-lite@Ambition/);
 
   const security = readPluginText('SECURITY.md');
   assert.equal(hasChinese(security), true);
