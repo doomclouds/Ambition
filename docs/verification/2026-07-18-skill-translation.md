@@ -579,3 +579,42 @@ foreach ($skillDir in $skillDirs) {
 - `test-runtime-scripts.sh` 与 `test-package-codex-plugin.sh`：全部通过。
 - 正式归档从已提交的 `abea9de` 生成：`superpowers-lite-0.1.2.zip`，58 个条目、
   13 个技能，SHA-256 `ebd522bb8839f828a884590e2c560527af1f60b818aa7c1d6e00c0b67a6e1ccc`。
+
+---
+
+# 全技能深度补强与 `0.1.3` 发布验证
+
+## 全量审计
+
+- 对当前 13 个技能和一层参考逐项回读，并与原版 Superpowers
+  `d884ae04edebef577e82ff7c4e143debd0bbec99` 的能力边界比较。
+- `using-superpowers`、`using-git-worktrees` 已足够，保持不动；其余技能按真实缺口选择性补强，
+  没有按行数机械扩写。
+- 规划、执行和子代理开发统一增加逐任务提交硬边界：任务验证后立即形成独立 Git 提交，提交
+  失败不得标记完成或进入下一任务；最终统一审查不等于最终统一提交。
+
+## RED / GREEN
+
+- 先增加版本、深度参考、主技能语义、提示模板和压力场景契约。旧正文运行得到 30 项中
+  11 项通过、19 项按预期失败；独立压力场景测试因场景目录缺失失败。
+- 工作流、调试/TDD、完成证据与最终审查分组实现并分别验证、提交，最终 `npm test` 为
+  31/31 GREEN。
+- 最终统一审查发现 SDD 旧交接句仍允许无提交权限时保留工作树差异。新增禁止短语契约得到
+  1/3 GREEN、2 项预期 RED；修复后恢复 3/3 GREEN，并形成独立修复提交。
+
+## 完整验证
+
+- `npm --prefix .\plugins\superpowers-lite test`：31/31 通过。
+- 显式枚举全部技能运行 `quick_validate.py`：13/13 输出 `Skill is valid!`。
+- `validate_plugin.py .\plugins\superpowers-lite`：输出 `Plugin validation passed`。
+- `test-runtime-scripts.sh`：污染定位和临时路径安全的全部真实 Bash 行为测试通过。
+- `test-package-codex-plugin.sh`：ZIP/tar.gz 白名单、身份、元数据、可执行位、哈希和重复构建通过。
+- Codex-only 禁止路径/术语扫描与 `git diff --check` 通过。
+
+## 正式归档
+
+- 从干净提交 `ab6f15e` 生成 `superpowers-lite-0.1.3.zip`。
+- 根层仍只包含 `.codex-plugin/`、`assets/`、`skills/`、`README.md` 和 `LICENSE`。
+- 归档包含 60 个条目、13 个技能，SHA-256
+  `9f2189722a1f3d17423bb8289ed74d628dd1eef6be67e48e9f18ef1ba813f7c7`。
+- 本轮没有 push 或 PR；本地提交保持为用户可审查的独立交付历史。
